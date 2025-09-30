@@ -15,6 +15,7 @@
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mongodb": "^4.0.6",
+    "@types/multer": "^2.0.0",
     "@types/node": "^24.6.0",
     "@types/node-emoji": "^1.8.2",
     "nodemon": "^3.1.10",
@@ -31,6 +32,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.20.0",
     "mongoose": "^8.18.3",
+    "multer": "^2.0.2",
     "node-emoji": "^2.2.0"
   }
 }

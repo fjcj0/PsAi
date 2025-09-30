@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import userRoutes from "../routes/userRoute";
-import mongoose from 'mongoose';
+import { connectDB } from "../lib/db";
 
 dotenv.config();
 
@@ -19,20 +19,16 @@ if (!MongoUrl) {
 const app = express();
 
 app.use(cookieParser());
-
 app.use(cors());
-
 app.use(express.json());
 
 app.use("/api/auth", userRoutes);
 
-mongoose.connect(MongoUrl)
-    .then(() => {
-        console.log('Database is connected successfully!!');
-        app.listen(PORT, () => {
-            console.log(chalk.cyanBright(`Server is running on link: http://localhost:${PORT}`));
-        });
-    })
-    .catch((error) => {
-        console.error(chalk.red('Database connection error:', error.message));
-    });
+app.listen(PORT, () => {
+    try {
+        connectDB();
+        console.log(chalk.cyanBright.bold(`App is running on localhost: http://localhost:${PORT}`));
+    } catch (error) {
+        console.log(chalk.red.bold(error instanceof Error ? error.message : String(error)));
+    }
+});
