@@ -6,7 +6,7 @@ import cors from "cors";
 import userRoutes from "../routes/userRoute";
 import { connectDB } from "../lib/db";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const MongoUrl = process.env.MONGO_URL;
 
@@ -19,7 +19,9 @@ if (!MongoUrl) {
 const app = express();
 
 app.use(cookieParser());
-app.use(cors());
+
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+
 app.use(express.json());
 
 app.use("/api/auth", userRoutes);
