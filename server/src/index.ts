@@ -1,12 +1,13 @@
+import dotenv from "dotenv";
+dotenv.config({ quiet: true });
 import express from "express";
 import chalk from "chalk";
-import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import userRoutes from "../routes/userRoute";
+import authRoutes from "../routes/authRoute";
 import { connectDB } from "../lib/db";
-
-dotenv.config({ quiet: true });
+import session from "express-session";
+import passport from "../config/passport";
 
 const MongoUrl = process.env.MONGO_URL;
 
@@ -18,13 +19,25 @@ if (!MongoUrl) {
 
 const app = express();
 
-app.use(cookieParser());
-
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 app.use(express.json());
 
-app.use("/api/auth", userRoutes);
+app.use(cookieParser());
+
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET || "secret",
+        resave: false,
+        saveUninitialized: true
+    })
+);
+
+app.use(passport.initialize());
+
+app.use(passport.session());
+
+app.use("/api/auth", authRoutes);
 
 app.listen(PORT, () => {
     try {

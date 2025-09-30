@@ -20,6 +20,8 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^24.6.0",
     "@types/node-emoji": "^1.8.2",
+    "@types/passport": "^1.0.17",
+    "@types/passport-google-oauth2": "^0.1.10",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
@@ -37,6 +39,8 @@
     "mongodb": "^6.20.0",
     "mongoose": "^8.18.3",
     "multer": "^2.0.2",
-    "node-emoji": "^2.2.0"
+    "node-emoji": "^2.2.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth2": "^0.2.0"
   }
 }
