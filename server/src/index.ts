@@ -19,6 +19,13 @@ if (!MongoUrl) {
 
 const app = express();
 
+const corsOptions = {
+    origin: process.env.NODE_ENV == 'development' ? "http://localhost:3000" : `${process.env.CLIENT_URL}`,
+    credentials: true
+};
+
+app.use(cors(corsOptions));
+
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 app.use(express.json());

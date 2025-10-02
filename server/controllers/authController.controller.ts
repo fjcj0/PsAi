@@ -10,6 +10,11 @@ export const loginSuccess = (request: Request, response: Response) => {
 export const logoutUser = (request: Request, response: Response, next: NextFunction) => {
     request.logout((err) => {
         if (err) return next(err);
+        response.clearCookie("jwt", {
+            httpOnly: true,
+            sameSite: "strict",
+            secure: process.env.NODE_ENV !== "development",
+        });
         response.redirect("http://localhost:3000");
     });
 };

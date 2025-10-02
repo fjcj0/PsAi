@@ -19,10 +19,6 @@ const messageSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        isImage: {
-            type: Boolean,
-            default: false,
-        },
         imageUrl: {
             type: String,
             default: false
