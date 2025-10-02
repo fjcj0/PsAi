@@ -17,3 +17,10 @@ interface contentProps {
     titleButtonOne: String;
     titleButtonTwo: String;
 }
+interface inputSettingProps {
+    type: string;
+    placeholder: string;
+    isActive: boolean;
+    text: string;
+    setText: (value: string) => void;
+}

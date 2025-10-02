@@ -6,7 +6,7 @@ axios.defaults.withCredentials = true;
 const API_URL = "/api/auth";
 
 interface AuthState {
-    isAuth: boolean;
+    isAuth: boolean | null;
     isLoading: boolean;
     user: any;
     fetchUser: () => Promise<void>;
@@ -14,7 +14,7 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-    isAuth: false,
+    isAuth: null,
     isLoading: false,
     user: null,
 

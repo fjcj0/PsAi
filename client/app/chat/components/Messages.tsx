@@ -1,7 +1,8 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { useMessage } from "./MessageContext";
+import { useMessage } from "../../context/MessageContext";
+import { useAuthStore } from "@/store/authStore";
 type Message = {
     role: "user" | "ai";
     content: string;
@@ -9,8 +10,9 @@ type Message = {
 };
 const Messages = () => {
     const avatars = ['/logoman.png', '/logowoman.png', '/Morgan.png', '/earthlogo.png'];
-    const { message, image } = useMessage();
+    const { message, image, conversation } = useMessage();
     const [messages, setMessages] = useState<Message[] | null>(null);
+    const { user } = useAuthStore();
     const msgs: Message[] = [
         { role: "user", content: "What is API?", image: '' },
         { role: "ai", content: "An API (Application Programming Interface) allows different software applications to communicate with each other.", image: '/earthlogo.png' },
@@ -31,7 +33,7 @@ const Messages = () => {
             {messages === null ? (
                 <div className="w-full flex flex-col items-center justify-center gap-5 text-center px-4">
                     <h1 className="text-5xl font-bold text-white">
-                        Hello Jack To
+                        Hello {user?.displayName ? user.displayName : 'Jack'} To
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-500/80 to-white">
                             PsAi
                         </span>
@@ -45,7 +47,7 @@ const Messages = () => {
                 <div className="flex flex-col gap-6 w-full">
                     {messages.map((msg, idx) => {
                         const isUser = msg.role === "user";
-                        const avatarSrc = isUser ? avatars[0] : avatars[3];
+                        const avatarSrc = isUser ? user?.image ? user?.image : avatars[0] : avatars[3];
                         return (
                             <div
                                 key={idx}

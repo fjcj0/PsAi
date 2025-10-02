@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { Image as ImageIcon, Send } from 'lucide-react';
-import { useMessage } from './MessageContext';
+import { useMessage } from '../../context/MessageContext';
 const Input = () => {
     const { message, setMessage, image, setImage } = useMessage();
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

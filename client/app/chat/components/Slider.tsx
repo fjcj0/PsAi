@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import useSlideStore from "@/store/slideStore";
-import { MoreVertical, Trash, ChartBarIcon, List, Settings, XIcon } from "lucide-react";
+import { MoreVertical, Trash, MessageCircle, List, Settings, XIcon } from "lucide-react";
+import { useMessage } from "@/app/context/MessageContext";
 const Slider = () => {
+    const { setConversation, conversation } = useMessage();
     const [mounted, setMounted] = useState(false);
     const { isSlideOpen, toggleSlide } = useSlideStore();
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
-    const sections = [
+    const conversations = [
         "Hello Gemini How Are You",
         "Where You From",
         "How Could I Be A Programmer",
@@ -42,8 +44,13 @@ const Slider = () => {
         setMounted(true);
     }, []);
     const handleDelete = (index: number) => {
-        console.log("Delete section:", sections[index]);
         setActiveIndex(null);
+    };
+    const onChangeConversation = (index: number) => {
+        setConversation(conversations[index]);
+    };
+    const onClickNewChat = () => {
+        setConversation('');
     };
     if (!mounted) return null;
     return (
@@ -53,7 +60,6 @@ const Slider = () => {
     ${isSlideOpen ? "md:w-[15rem]" : "md:w-[5rem]"}
   `}
         >
-
             <div className={`md:hidden z-50 text-white/50 text-sm hover:text-white duration-300 top-[3.5rem] left-[1.5rem] ${isSlideOpen ? 'hidden' : 'fixed'}`}>
                 <button onClick={toggleSlide}>
                     <List />
@@ -69,8 +75,8 @@ const Slider = () => {
                     </button>
                 </div>
                 <div className="flex items-center justify-between w-full">
-                    <button className="text-white/50 flex items-center gap-2 text-sm hover:text-white duration-300">
-                        <ChartBarIcon />
+                    <button type="button" onClick={onClickNewChat} className="text-white/50 flex items-center gap-2 text-sm hover:text-white duration-300">
+                        <MessageCircle />
                         <span className={`${isSlideOpen ? "inline" : "hidden"} duration-300`}>New chat</span>
                     </button>
                     <button
@@ -82,27 +88,31 @@ const Slider = () => {
                 </div>
             </div>
             <div className={`gap-4 overflow-y-scroll max-h-[40rem] mt-5 ${isSlideOpen ? "flex flex-col" : "hidden"} p-5`}>
-                {sections.map((section, index) => (
+                {conversations.map((conv, index) => (
                     <div
                         key={index}
-                        className="text-white/50 hover:bg-white/30 duration-300 p-3 rounded-lg flex justify-between items-center gap-5 text-sm w-full"
+                        className="text-white/50 hover:bg-white/30 duration-300 p-3 rounded-lg flex justify-between items-center gap-5 text-sm w-full cursor-pointer"
+                        onClick={() => onChangeConversation(index)}
                     >
-                        <p>{section}</p>
+                        <p>{conv}</p>
                         <div className="relative">
                             <button
                                 className="p-1 hover:bg-white/10 rounded-full transition"
-                                onClick={() =>
-                                    setActiveIndex(activeIndex === index ? null : index)
-                                }
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveIndex(activeIndex === index ? null : index);
+                                }}
                             >
                                 <MoreVertical size={18} />
                             </button>
-
                             {activeIndex === index && (
                                 <div className="absolute right-0 top-full mt-1 w-24 bg-slate-900 rounded-md shadow-lg z-20">
                                     <button
                                         className="flex items-center gap-2 w-full p-2 text-sm text-white/40 transition rounded-md hover:bg-slate-950 hover:text-white"
-                                        onClick={() => handleDelete(index)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDelete(index);
+                                        }}
                                     >
                                         Delete
                                     </button>

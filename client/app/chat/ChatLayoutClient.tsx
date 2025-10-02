@@ -3,7 +3,7 @@ import { ReactNode, useState, useEffect } from "react";
 import Slider from "./components/Slider";
 import Header from "../components/Header";
 import useSlideStore from "@/store/slideStore";
-import { MessageProvider } from "./components/MessageContext";
+import { MessageProvider } from "../context/MessageContext";
 export default function ChatLayoutClient({ children }: { children: ReactNode }) {
     const [mounted, setMounted] = useState(false);
     const { isSlideOpen } = useSlideStore();
