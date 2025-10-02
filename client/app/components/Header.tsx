@@ -47,9 +47,9 @@ const Header = () => {
             ) : (
                 <button
                     onClick={handleGoogleSignIn}
-                    className="text-white font-bold bg-blue-700 px-5 py-3 rounded-lg hover:bg-blue-900 duration-300"
+                    className="text-white flex flex-row items-center justify-center gap-1 font-bold bg-blue-700 px-5 py-3 rounded-lg hover:bg-blue-900 duration-300"
                 >
-                    Sign in with Google
+                    <Image src={'/google.png'} alt="google logo" width={30} height={30} /> Sign in with Google
                 </button>
             )}
         </div>
