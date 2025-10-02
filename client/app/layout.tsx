@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PsChat",
+  title: "PsAI",
   description: "AI chat using typescript",
 };
 

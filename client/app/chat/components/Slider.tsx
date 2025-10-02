@@ -48,9 +48,12 @@ const Slider = () => {
     if (!mounted) return null;
     return (
         <div
-            className={`fixed overflow-y-scroll duration-300 z-10 min-h-[100vh] flex flex-col justify-between bg-slate-950 md:bg-slate-800/20 text-white
-            ${isSlideOpen ? "w-[15rem]" : "w-[0rem]"} md:${isSlideOpen ? "w-[15rem]" : "w-[5rem]"}`}
+            className={`fixed top-0 left-0 h-screen overflow-y-auto transition-all duration-300 z-10 flex flex-col justify-between bg-slate-950 md:bg-slate-800/20 text-white
+    ${isSlideOpen ? "w-[15rem]" : "w-0"} 
+    ${isSlideOpen ? "md:w-[15rem]" : "md:w-[5rem]"}
+  `}
         >
+
             <div className={`md:hidden z-50 text-white/50 text-sm hover:text-white duration-300 top-[3.5rem] left-[1.5rem] ${isSlideOpen ? 'hidden' : 'fixed'}`}>
                 <button onClick={toggleSlide}>
                     <List />

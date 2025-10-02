@@ -4,29 +4,25 @@ import express from "express";
 import chalk from "chalk";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import authRoutes from "../routes/authRoute";
-import { connectDB } from "../lib/db";
 import session from "express-session";
 import passport from "../config/passport";
-
-const MongoUrl = process.env.MONGO_URL;
+import authRoutes from "../routes/authRoute";
+import { connectDB } from "../lib/db";
 
 const PORT = process.env.PORT || 5205;
 
-if (!MongoUrl) {
-    throw new Error(chalk.red.bold('MONGO_URL is not defined in your .env file!!'));
-}
+const MongoUrl = process.env.MONGO_URL;
+
+if (!MongoUrl) throw new Error(chalk.red.bold("MONGO_URL not defined"));
 
 const app = express();
 
-const corsOptions = {
-    origin: process.env.NODE_ENV == 'development' ? "http://localhost:3000" : `${process.env.CLIENT_URL}`,
-    credentials: true
-};
-
-app.use(cors(corsOptions));
-
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(
+    cors({
+        origin: "http://localhost:3000",
+        credentials: true,
+    })
+);
 
 app.use(express.json());
 
@@ -36,7 +32,12 @@ app.use(
     session({
         secret: process.env.SESSION_SECRET || "secret",
         resave: false,
-        saveUninitialized: true
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+        },
     })
 );
 
@@ -46,10 +47,10 @@ app.use(passport.session());
 
 app.use("/api/auth", authRoutes);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     try {
-        connectDB();
-        console.log(chalk.cyanBright.bold(`App is running on localhost: http://localhost:${PORT}`));
+        await connectDB();
+        console.log(chalk.cyanBright.bold(`Server running at http://localhost:${PORT}`));
     } catch (error) {
         console.log(chalk.red.bold(error instanceof Error ? error.message : String(error)));
     }

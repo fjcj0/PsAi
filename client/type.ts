@@ -12,7 +12,7 @@ interface homeProps {
 interface contentProps {
     title: String;
     paragraph: String;
-    background: String;
+    background: string;
     reverse: boolean;
     titleButtonOne: String;
     titleButtonTwo: String;
