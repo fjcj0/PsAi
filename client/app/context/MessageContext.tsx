@@ -2,10 +2,10 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface MessageContextType {
     message: string;
-    image: string;
+    image: string | null;
     conversation: string | null;
     setMessage: React.Dispatch<React.SetStateAction<string>>;
-    setImage: React.Dispatch<React.SetStateAction<string>>;
+    setImage: React.Dispatch<React.SetStateAction<string | null>>; // fix here
     setConversation: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
@@ -17,7 +17,7 @@ interface MessageProviderProps {
 
 export const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
     const [message, setMessage] = useState<string>('');
-    const [image, setImage] = useState<string>('');
+    const [image, setImage] = useState<string | null>(null); // fix here
     const [conversation, setConversation] = useState<string | null>(null);
 
     return (
