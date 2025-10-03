@@ -24,11 +24,6 @@ interface inputSettingProps {
     text: string;
     setText: (value: string) => void;
 }
-interface EditUserProps {
-    userId: string;
-    newDisplayName?: string | null;
-    newProfilePicture?: File | null;
-}
 interface AuthState {
     isAuth: boolean | null;
     isLoading: boolean;
@@ -38,6 +33,18 @@ interface AuthState {
     logout: () => Promise<void>;
     editUser: (props: EditUserProps) => Promise<void>;
 }
+type EditUserProps = {
+    userId: string;
+    newDisplayName?: string | null;
+    newProfilePicture?: File | null;
+};
+type AuthContextType = {
+    user: any;
+    isAuth: null | boolean;
+    loading: boolean;
+    logout: () => Promise<void>;
+    editUser: (data: EditUserProps) => Promise<void>;
+};
 interface User {
     displayName?: string;
     email?: string;

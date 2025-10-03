@@ -50,7 +50,7 @@ const Slider = () => {
         setConversation(conversations[index]);
     };
     const onClickNewChat = () => {
-        setConversation('');
+        setConversation(null);
     };
     if (!mounted) return null;
     return (

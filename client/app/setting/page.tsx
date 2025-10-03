@@ -1,81 +1,69 @@
 "use client";
-import { useAuthStore } from '@/store/authStore';
-import Image from 'next/image';
-import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import { Camera, Edit } from 'lucide-react';
-import Input from './components/Input';
-import toast from 'react-hot-toast';
-
+import Image from "next/image";
+import React, { useEffect, useRef, useState, ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
+import { Camera, Edit } from "lucide-react";
+import Input from "./components/Input";
+import toast from "react-hot-toast";
+import { useAuth } from "../context/UserContext";
 const Page: React.FC = () => {
     const router = useRouter();
-    const { fetchUser, user, isAuth, editUser } = useAuthStore();
-
-    const [newDisplayName, setNewDisplayName] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
-    const [previewImage, setPreviewImage] = useState<string>('');
+    const { user, isAuth, logout, loading } = useAuth();
+    const { editUser } = useAuth();
+    const [newDisplayName, setNewDisplayName] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [previewImage, setPreviewImage] = useState<string>("");
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
-
     const fileInputRef = useRef<HTMLInputElement>(null);
-
     useEffect(() => {
-        fetchUser();
-    }, [fetchUser]);
-
-    useEffect(() => {
-        if (isAuth === false) {
-            router.push('/');
+        if (!loading && isAuth === false) {
+            router.push("/");
         }
-    }, [isAuth, router]);
-
+    }, [isAuth, loading, router]);
     useEffect(() => {
         if (user) {
-            setNewDisplayName(user.displayName || '');
-            setEmail(user.email || '');
-            setPreviewImage(user.image || '');
+            setNewDisplayName(user.displayName || "");
+            setEmail(user.email || "");
+            setPreviewImage(user.image || "");
         }
     }, [user]);
-
+    if (loading) {
+        return (
+            <div className="w-screen h-screen flex items-center justify-center text-white">
+                Loading...
+            </div>
+        );
+    }
     if (!isAuth) return null;
-
     const handleCameraClick = () => {
         fileInputRef.current?.click();
     };
-
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file && user) {
             setSelectedImage(file);
-
             const toastId = toast.loading("Updating profile...");
-
             try {
                 await editUser({
                     userId: user._id,
                     newDisplayName: null,
                     newProfilePicture: file,
                 });
-
                 toast.success("Profile updated successfully!", { id: toastId });
-
                 const reader = new FileReader();
                 reader.onloadend = () => {
                     setPreviewImage(reader.result as string);
                 };
                 reader.readAsDataURL(file);
-
             } catch (error) {
                 console.error(error);
                 toast.error("Failed to update profile.", { id: toastId });
             }
         }
     };
-
     const handleChangeDisplayName = async () => {
         if (!user) return;
-
         const toastId = toast.loading("Updating display name...");
-
         try {
             await editUser({
                 userId: user._id,
@@ -87,20 +75,19 @@ const Page: React.FC = () => {
             toast.error("Failed to edit display name!", { id: toastId });
         }
     };
-
     return (
         <div className="w-screen h-screen bg-black flex items-center justify-center">
             <div className="grid grid-cols-1 md:grid-cols-2 bg-slate-400/10 p-5 rounded-xl gap-10 w-[90%]">
                 <div className="flex items-center justify-center">
                     <h1 className="text-4xl font-bold text-white text-center">
-                        Edit Your{' '}
+                        Edit Your{" "}
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-500/80 to-white">
                             PsAi
-                        </span>{' '}
+                        </span>{" "}
                         Here
                         <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-500/80 to-white">
-                            {user?.displayName || ''}
+                            {user?.displayName || ""}
                         </span>
                     </h1>
                 </div>
@@ -135,7 +122,6 @@ const Page: React.FC = () => {
                             />
                         </div>
                     </div>
-
                     <div className="w-full grid grid-cols-1 gap-3">
                         <Input
                             type="text"
@@ -152,7 +138,6 @@ const Page: React.FC = () => {
                             setText={setEmail}
                         />
                     </div>
-
                     <div className="w-full flex items-center justify-center">
                         <button
                             onClick={handleChangeDisplayName}
