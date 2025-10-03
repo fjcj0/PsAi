@@ -7,6 +7,7 @@ import cors from "cors";
 import session from "express-session";
 import passport from "../config/passport";
 import authRoutes from "../routes/authRoute";
+import messageRoutes from '../routes/messageRoute';
 import { connectDB } from "../lib/db";
 
 const PORT = process.env.PORT || 5205;
@@ -46,6 +47,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/api/auth", authRoutes);
+
+app.use("/api/message", messageRoutes);
 
 app.listen(PORT, async () => {
     try {

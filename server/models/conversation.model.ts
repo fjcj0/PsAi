@@ -6,7 +6,7 @@ const conversationSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
-        section: {
+        conversation: {
             type: String,
             required: true,
         },

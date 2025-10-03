@@ -22,13 +22,13 @@ export const logoutUser = (request: Request, response: Response, next: NextFunct
     });
 };
 
-export const editUser = async (req: Request, res: Response) => {
+export const editUser = async (request: Request, response: Response) => {
     try {
-        const { newDisplayName, userId } = req.body;
-        const file = req.file;
-        if (!userId) return res.status(400).json({ message: "userId required" });
+        const { newDisplayName, userId } = request.body;
+        const file = request.file;
+        if (!userId) return response.status(400).json({ message: "userId required" });
         const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ message: "User not found" });
+        if (!user) return response.status(404).json({ message: "User not found" });
         if (newDisplayName) user.displayName = newDisplayName;
         if (file) {
             if (user.image) {
@@ -45,8 +45,8 @@ export const editUser = async (req: Request, res: Response) => {
             user.image = uploadResult.secure_url;
         }
         await user.save();
-        return res.status(200).json({ message: "User updated", user });
-    } catch (err) {
-        return res.status(400).json({ message: err instanceof Error ? err.message : String(err) });
+        return response.status(200).json({ message: "User updated", user });
+    } catch (error) {
+        return response.status(400).json({ message: error instanceof Error ? error.message : String(error) });
     }
 };
