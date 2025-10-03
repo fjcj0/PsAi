@@ -123,7 +123,9 @@ const Slider = () => {
                 ))}
             </div>
             <div className="w-full flex justify-end mt-auto p-5">
-                <button className="text-white/50 flex items-center gap-2 text-sm hover:text-white duration-300">
+                <button
+                    onClick={() => window.location.href = '/setting'}
+                    className="text-white/50 flex items-center gap-2 text-sm hover:text-white duration-300">
                     <Settings />
                     <span className={`${isSlideOpen ? "inline" : "hidden"} duration-300`}>Settings & Help</span>
                 </button>

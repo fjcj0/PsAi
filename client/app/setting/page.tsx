@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Camera, Edit } from 'lucide-react';
 import Input from './components/Input';
+import toast from 'react-hot-toast';
 
 const Page: React.FC = () => {
     const router = useRouter();
@@ -43,27 +44,50 @@ const Page: React.FC = () => {
 
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
+        if (file && user) {
             setSelectedImage(file);
-            if (!user) return;
+
+            const toastId = toast.loading("Updating profile...");
+
             try {
                 await editUser({
                     userId: user._id,
-                    newDisplayName,
+                    newDisplayName: null,
                     newProfilePicture: file,
                 });
-                alert('Profile updated successfully!');
+
+                toast.success("Profile updated successfully!", { id: toastId });
+
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setPreviewImage(reader.result as string);
+                };
+                reader.readAsDataURL(file);
+
             } catch (error) {
                 console.error(error);
-                alert('Failed to update profile.');
+                toast.error("Failed to update profile.", { id: toastId });
             }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewImage(reader.result as string);
-            };
-            reader.readAsDataURL(file);
         }
     };
+
+    const handleChangeDisplayName = async () => {
+        if (!user) return;
+
+        const toastId = toast.loading("Updating display name...");
+
+        try {
+            await editUser({
+                userId: user._id,
+                newDisplayName,
+                newProfilePicture: null,
+            });
+            toast.success("Display name updated successfully!", { id: toastId });
+        } catch (error) {
+            toast.error("Failed to edit display name!", { id: toastId });
+        }
+    };
+
     return (
         <div className="w-screen h-screen bg-black flex items-center justify-center">
             <div className="grid grid-cols-1 md:grid-cols-2 bg-slate-400/10 p-5 rounded-xl gap-10 w-[90%]">
@@ -131,8 +155,8 @@ const Page: React.FC = () => {
 
                     <div className="w-full flex items-center justify-center">
                         <button
+                            onClick={handleChangeDisplayName}
                             type="button"
-
                             className="flex flex-row gap-2 items-center justify-center bg-black/10 text-white/50 hover:text-white hover:bg-black/50 duration-300 px-7 py-3 font-bold rounded-lg"
                         >
                             <Edit size={20} />
@@ -144,5 +168,4 @@ const Page: React.FC = () => {
         </div>
     );
 };
-
 export default Page;

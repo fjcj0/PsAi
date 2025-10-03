@@ -24,15 +24,10 @@ interface inputSettingProps {
     text: string;
     setText: (value: string) => void;
 }
-interface editUserProps {
-    newDisplayName: string | null;
-    newProfilePicture: File | null;
-    userId: string;
-}
 interface EditUserProps {
     userId: string;
-    newDisplayName?: string;
-    newProfilePicture?: File;
+    newDisplayName?: string | null;
+    newProfilePicture?: File | null;
 }
 interface AuthState {
     isAuth: boolean | null;
