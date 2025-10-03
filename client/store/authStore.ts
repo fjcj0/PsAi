@@ -1,23 +1,12 @@
 import { create } from "zustand";
-import axios from "axios";
-
+import axios, { AxiosError } from "axios";
 axios.defaults.withCredentials = true;
-
 const API_URL = "/api/auth";
-
-interface AuthState {
-    isAuth: boolean | null;
-    isLoading: boolean;
-    user: any;
-    fetchUser: () => Promise<void>;
-    logout: () => Promise<void>;
-}
-
 export const useAuthStore = create<AuthState>((set) => ({
     isAuth: null,
     isLoading: false,
     user: null,
-
+    error: undefined,
     fetchUser: async () => {
         set({ isLoading: true });
         try {
@@ -27,19 +16,44 @@ export const useAuthStore = create<AuthState>((set) => ({
             } else {
                 set({ user: null, isAuth: false });
             }
-        } catch (error) {
-            set({ user: null, isAuth: false });
+        } catch (err) {
+            const error = err as AxiosError;
+            console.log(error.message);
+            set({ user: null, isAuth: false, error: error.message });
         } finally {
             set({ isLoading: false });
         }
     },
-
     logout: async () => {
         try {
             await axios.get(`${API_URL}/logout`, { withCredentials: true });
             set({ user: null, isAuth: false });
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            const error = err as AxiosError;
+            console.log(error.message);
+        }
+    },
+    editUser: async ({ userId, newDisplayName, newProfilePicture }: EditUserProps) => {
+        set({ isLoading: true, error: undefined });
+        try {
+            const formData = new FormData();
+            formData.append("userId", userId);
+            if (newDisplayName) formData.append("newDisplayName", newDisplayName);
+            if (newProfilePicture) formData.append("newProfilePicture", newProfilePicture);
+            const response = await axios.post(`${API_URL}/edit-user`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+                withCredentials: true,
+            });
+            set({
+                user: response.data.user,
+                isLoading: false,
+            });
+        } catch (err) {
+            const error = err as AxiosError<{ message: string }>;
+            const message = error.response?.data?.message || error.message;
+            set({ error: message, isLoading: false });
+            console.log(message);
+            throw new Error(message);
         }
     },
 }));

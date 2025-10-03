@@ -6,10 +6,15 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/page": [
+    "/setting/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/setting/layout.js"
+    ],
+    "/setting/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/setting/page.js"
     ],
     "/chat/layout": [
       "static/chunks/webpack.js",
@@ -21,15 +26,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/chat/page.js"
     ],
-    "/setting/layout": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/setting/layout.js"
-    ],
-    "/setting/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/setting/page.js"
+      "static/chunks/app/page.js"
     ]
   }
 }

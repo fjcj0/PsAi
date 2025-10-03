@@ -24,3 +24,27 @@ interface inputSettingProps {
     text: string;
     setText: (value: string) => void;
 }
+interface editUserProps {
+    newDisplayName: string | null;
+    newProfilePicture: File | null;
+    userId: string;
+}
+interface EditUserProps {
+    userId: string;
+    newDisplayName?: string;
+    newProfilePicture?: File;
+}
+interface AuthState {
+    isAuth: boolean | null;
+    isLoading: boolean;
+    user: any;
+    error?: string;
+    fetchUser: () => Promise<void>;
+    logout: () => Promise<void>;
+    editUser: (props: EditUserProps) => Promise<void>;
+}
+interface User {
+    displayName?: string;
+    email?: string;
+    image?: string;
+}

@@ -7,7 +7,7 @@ const Header = () => {
     const { fetchUser, user, isAuth, logout } = useAuthStore();
     useEffect(() => {
         fetchUser();
-    }, [user]);
+    }, [fetchUser]);
     const handleGoogleSignIn = () => {
         window.location.href =
             process.env.NODE_ENV === "development"

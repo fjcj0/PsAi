@@ -1,6 +1,8 @@
 import { Router } from "express";
 import passport from "../config/passport";
-import { loginSuccess, logoutUser } from "../controllers/authController.controller";
+import { editUser, loginSuccess, logoutUser } from "../controllers/authController.controller";
+import { upload } from "../utils/multer";
+import { verifySession } from "../middleware/verifySession";
 
 const router = Router();
 
@@ -31,8 +33,10 @@ router.get(
     }
 );
 
-router.get("/success", loginSuccess);
+router.get("/success", verifySession, loginSuccess);
 
-router.get("/logout", logoutUser);
+router.get("/logout", verifySession, logoutUser);
+
+router.post('/edit-user', verifySession, upload.single('newProfilePicture'), editUser);
 
 export default router;

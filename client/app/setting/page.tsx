@@ -5,44 +5,64 @@ import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Camera, Edit } from 'lucide-react';
 import Input from './components/Input';
-interface User {
-    displayName?: string;
-    email?: string;
-    image?: string;
-}
+
 const Page: React.FC = () => {
     const router = useRouter();
-    const { fetchUser, user, isAuth } = useAuthStore();
+    const { fetchUser, user, isAuth, editUser } = useAuthStore();
+
     const [newDisplayName, setNewDisplayName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [previewImage, setPreviewImage] = useState<string>('');
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
     const fileInputRef = useRef<HTMLInputElement>(null);
+
     useEffect(() => {
         fetchUser();
     }, [fetchUser]);
+
     useEffect(() => {
         if (isAuth === false) {
             router.push('/');
         }
     }, [isAuth, router]);
+
     useEffect(() => {
-        if (user?.displayName) setNewDisplayName(user.displayName);
-        if (user?.email) setEmail(user.email);
-        if (user?.image) setSelectedImage(user.image);
+        if (user) {
+            setNewDisplayName(user.displayName || '');
+            setEmail(user.email || '');
+            setPreviewImage(user.image || '');
+        }
     }, [user]);
+
     if (!isAuth) return null;
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+
+    const handleCameraClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            setSelectedImage(file);
+            if (!user) return;
+            try {
+                await editUser({
+                    userId: user._id,
+                    newDisplayName,
+                    newProfilePicture: file,
+                });
+                alert('Profile updated successfully!');
+            } catch (error) {
+                console.error(error);
+                alert('Failed to update profile.');
+            }
             const reader = new FileReader();
             reader.onloadend = () => {
-                setSelectedImage(reader.result as string);
+                setPreviewImage(reader.result as string);
             };
             reader.readAsDataURL(file);
         }
-    };
-    const handleCameraClick = () => {
-        fileInputRef.current?.click();
     };
     return (
         <div className="w-screen h-screen bg-black flex items-center justify-center">
@@ -63,9 +83,9 @@ const Page: React.FC = () => {
                 <div className="w-full flex flex-col items-start justify-start gap-y-4">
                     <div className="w-full flex flex-col items-center justify-center gap-4">
                         <div className="relative">
-                            {selectedImage ? (
+                            {previewImage ? (
                                 <Image
-                                    src={selectedImage}
+                                    src={previewImage}
                                     alt={user?.displayName || "User Image"}
                                     width={80}
                                     height={80}
@@ -81,6 +101,7 @@ const Page: React.FC = () => {
                             >
                                 <Camera className="w-5 h-6 text-black" />
                             </button>
+
                             <input
                                 type="file"
                                 ref={fileInputRef}
@@ -90,6 +111,7 @@ const Page: React.FC = () => {
                             />
                         </div>
                     </div>
+
                     <div className="w-full grid grid-cols-1 gap-3">
                         <Input
                             type="text"
@@ -106,9 +128,11 @@ const Page: React.FC = () => {
                             setText={setEmail}
                         />
                     </div>
+
                     <div className="w-full flex items-center justify-center">
                         <button
                             type="button"
+
                             className="flex flex-row gap-2 items-center justify-center bg-black/10 text-white/50 hover:text-white hover:bg-black/50 duration-300 px-7 py-3 font-bold rounded-lg"
                         >
                             <Edit size={20} />
@@ -120,4 +144,5 @@ const Page: React.FC = () => {
         </div>
     );
 };
+
 export default Page;
