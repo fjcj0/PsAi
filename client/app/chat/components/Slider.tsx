@@ -62,7 +62,7 @@ const Slider = () => {
                 ) : (
                     conversationsUser.map((conv: ConversationType, index: number) => (
                         <div
-                            key={conv._id}
+                            key={index}
                             className="text-white/50 hover:bg-white/30 duration-300 p-3 rounded-lg flex justify-between items-center gap-5 text-sm w-full cursor-pointer"
                             onClick={() => onChangeConversation(index)}
                         >

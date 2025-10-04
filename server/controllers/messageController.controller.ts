@@ -76,7 +76,6 @@ export const deleteConversation = async (req: Request, res: Response) => {
     }
 };
 
-
 export const getMessagesByConversation = async (req: Request, res: Response) => {
     try {
         const { userId, conversationId } = req.params;

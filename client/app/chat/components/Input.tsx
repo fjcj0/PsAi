@@ -1,22 +1,37 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { Image as ImageIcon, Send, X as XIcon } from 'lucide-react';
 import { useMessage } from '../../context/MessageContext';
 import Image from 'next/image';
+import { useMessageStore } from '@/store/messageStore';
+import { useAuth } from '@/app/context/UserContext';
 const Input = () => {
-    const { message, setMessage, image, setImage } = useMessage();
+    const { user } = useAuth();
+    const { message, setMessage, conversation } = useMessage();
+    const { sendMessage } = useMessageStore();
+    const [preview, setPreview] = useState<string | null>(null);
+    const [file, setFile] = useState<File | null>(null);
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
+            const selectedFile = e.target.files[0];
+            setFile(selectedFile);
             const reader = new FileReader();
             reader.onload = () => {
-                if (reader.result) setImage(reader.result as string);
+                if (reader.result) setPreview(reader.result as string);
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(selectedFile);
         }
     };
     const removeImage = () => {
-        setImage(null);
+        setPreview(null);
+        setFile(null);
+    };
+    const onSendMessage = async () => {
+        try {
+
+        } catch (error) {
+            console.log(error);
+        }
     };
     return (
         <div className="relative w-full flex flex-row px-3 py-4 rounded-xl justify-between text-white/30 bg-slate-700/20">
@@ -38,16 +53,20 @@ const Input = () => {
                 <label htmlFor="image-upload" className="hover:text-white cursor-pointer">
                     <ImageIcon size={20} />
                 </label>
-                <button type="button" className="hover:text-white duration-300">
+                <button
+                    type="button"
+                    onClick={onSendMessage}
+                    className="hover:text-white duration-300"
+                >
                     <Send size={20} />
                 </button>
             </div>
-            {image && (
+            {preview && (
                 <div className="absolute bottom-full mb-2">
                     <div className="relative">
                         <Image
-                            src={image}
-                            alt="image"
+                            src={preview}
+                            alt="preview"
                             width={100}
                             height={100}
                             className="rounded-xl"
