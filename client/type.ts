@@ -63,5 +63,4 @@ export interface MessageStore {
     getConversations: (userId: string) => Promise<void>;
     deleteConversation: (userId: string, conversationId: string) => Promise<void>;
     getMessages: (userId: string, conversationId: string) => Promise<void>;
-    sendMessage: (userId: string, message: string, conversationId: string | null, image: File | null) => Promise<void>;
 }

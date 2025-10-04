@@ -834,15 +834,15 @@ video {
 .rounded-xl {
   border-radius: 0.75rem;
 }
-.rounded {
-  border-radius: 0.25rem;
-}
 .rounded-b-full {
   border-bottom-right-radius: 9999px;
   border-bottom-left-radius: 9999px;
 }
 .border-\[0\.5px\] {
   border-width: 0.5px;
+}
+.border {
+  border-width: 1px;
 }
 .border-gray-200 {
   --tw-border-opacity: 1;

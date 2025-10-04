@@ -49,11 +49,4 @@ export const useMessageStore = create<MessageStore>((set) => ({
             set({ isLoadingMessages: false });
         }
     },
-    sendMessage: async (userId: string, message: string, conversation: string | null, image: File | null) => {
-        try {
-
-        } catch (error) {
-            console.log("Failed to send message:", error);
-        }
-    },
 }));

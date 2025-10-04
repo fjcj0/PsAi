@@ -1,16 +1,8 @@
 import { Router } from "express";
-import { conversationsOfUser, deleteConversation, getMessagesByConversation, sendMessageToAi } from "../controllers/messageController.controller";
-import { upload } from "../utils/multer";
+import { conversationsOfUser, deleteConversation, getMessagesByConversation } from "../controllers/messageController.controller";
 import { verifySession } from "../middleware/verifySession";
 
 const router = Router();
-
-router.post(
-    "/send-message",
-    verifySession,
-    upload.single("file"),
-    sendMessageToAi
-);
 
 router.get('/conversations', verifySession, conversationsOfUser);
 
