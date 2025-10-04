@@ -1,28 +1,25 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/UserContext";
 import Image from "next/image";
 import React from "react";
-
 const Header = () => {
     const { user, isAuth, logout, loading } = useAuth();
     const [displayInfo, setDisplayInfo] = useState(false);
-
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
     const handleGoogleSignIn = () => {
         window.location.href =
             process.env.NODE_ENV === "development"
                 ? "http://localhost:5205/api/auth/google"
                 : "/api/auth/google";
     };
-
     const handleLogout = async () => {
         await logout();
     };
-
-    if (loading) {
-        return <div className="p-5">Loading...</div>;
-    }
-
+    if (!mounted) return null;
     return (
         <div className="w-full flex items-center justify-between px-20 py-6">
             <Image
@@ -32,7 +29,9 @@ const Header = () => {
                 height={110}
                 className="rounded-full"
             />
-            {isAuth && user ? (
+            {loading ? (
+                <div className="p-5">Loading...</div>
+            ) : isAuth && user ? (
                 <div className="relative flex flex-col items-center justify-center">
                     <button
                         type="button"
@@ -40,19 +39,16 @@ const Header = () => {
                         onClick={() => setDisplayInfo(!displayInfo)}
                     >
                         <Image
-                            src={user.image}
-                            alt={user.displayName}
+                            src={user?.image || "/default-avatar.png"}
+                            alt={user?.displayName || "User"}
                             width={50}
                             height={50}
                             className="rounded-full"
                         />
                     </button>
                     {displayInfo && (
-                        <div
-                            className="absolute flex flex-col items-center justify-center gap-3 p-5 bg-white rounded-md
-                    w-[8rem] top-full my-2"
-                        >
-                            <p>{user.displayName}</p>
+                        <div className="absolute flex flex-col items-center justify-center gap-3 p-5 bg-white rounded-md w-[8rem] top-full my-2 shadow-lg">
+                            <p>{user?.displayName}</p>
                             <button
                                 onClick={handleLogout}
                                 className="bg-red-600 hover:bg-red-700 duration-300 text-white px-4 py-2 rounded-lg font-bold"
