@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import axios, { AxiosError } from "axios";
+import { AuthState, EditUserProps } from "@/type";
 axios.defaults.withCredentials = true;
 const API_URL = "/api/auth";
 export const useAuthStore = create<AuthState>((set) => ({

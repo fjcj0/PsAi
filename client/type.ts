@@ -1,15 +1,15 @@
-interface buttonProps {
+export interface buttonProps {
     title: String;
     style: String;
     type: String;
     icon: String;
 };
-interface homeProps {
+export interface homeProps {
     title: String;
     paragraph: String;
     logo: String;
 }
-interface contentProps {
+export interface contentProps {
     title: String;
     paragraph: String;
     background: string;
@@ -17,14 +17,14 @@ interface contentProps {
     titleButtonOne: String;
     titleButtonTwo: String;
 }
-interface inputSettingProps {
+export interface inputSettingProps {
     type: string;
     placeholder: string;
     isActive: boolean;
     text: string;
     setText: (value: string) => void;
 }
-interface AuthState {
+export interface AuthState {
     isAuth: boolean | null;
     isLoading: boolean;
     user: any;
@@ -33,20 +33,35 @@ interface AuthState {
     logout: () => Promise<void>;
     editUser: (props: EditUserProps) => Promise<void>;
 }
-type EditUserProps = {
+export type EditUserProps = {
     userId: string;
     newDisplayName?: string | null;
     newProfilePicture?: File | null;
 };
-type AuthContextType = {
+export type AuthContextType = {
     user: any;
     isAuth: null | boolean;
     loading: boolean;
     logout: () => Promise<void>;
     editUser: (data: EditUserProps) => Promise<void>;
 };
-interface User {
+export interface User {
     displayName?: string;
     email?: string;
     image?: string;
+}
+export interface ConversationType {
+    _id: string;
+    conversation: string;
+}
+export interface MessageStore {
+    conversationsUser: ConversationType[];
+    messagesInConversation: any[];
+    isLoadingMessages: boolean;
+    isLoadingAi: boolean;
+    isLoadingConversations: boolean;
+    getConversations: (userId: string) => Promise<void>;
+    deleteConversation: (userId: string, conversationId: string) => Promise<void>;
+    getMessages: (userId: string, conversationId: string) => Promise<void>;
+    sendMessage: (userId: string, message: string, conversationId: string | null, image: File | null) => Promise<void>;
 }

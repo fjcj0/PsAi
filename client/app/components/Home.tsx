@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import Content from './Content';
+import { homeProps } from '@/type';
 const Home = ({ title, paragraph, logo }: homeProps) => {
     return (
         <div className='w-full h-full flex flex-col items-center justify-between'>

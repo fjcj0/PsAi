@@ -12,10 +12,10 @@ router.post(
     sendMessageToAi
 );
 
-router.post('/conversations', verifySession, conversationsOfUser);
+router.get('/conversations', verifySession, conversationsOfUser);
 
 router.post('/get-messages', verifySession, getMessagesByConversation);
 
-router.delete('/delete-conversation/:userId/:conversation', verifySession, deleteConversation);
+router.delete('/delete-conversation/:userId/:conversationId', verifySession, deleteConversation);
 
 export default router;

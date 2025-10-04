@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
         source: "/api/auth/:path*",
         destination: "http://localhost:5205/api/auth/:path*",
       },
+      {
+        source: "/api/message/:path*",
+        destination: "http://localhost:5205/api/message/:path*",
+      },
     ];
   },
 };

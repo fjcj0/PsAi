@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Conversation } from "../models/conversation.model";
 import { Message } from "../models/message.model";
 import { callAiApi } from "../utils/callAiApi";
+import mongoose from "mongoose";
 export const sendMessageToAi = async (req: Request, res: Response) => {
     try {
         const { userId, conversation, message } = req.body;
@@ -41,11 +42,11 @@ export const sendMessageToAi = async (req: Request, res: Response) => {
 
 export const conversationsOfUser = async (req: Request, res: Response) => {
     try {
-        const { userId } = req.body;
+        const { userId } = req.query;
         if (!userId) return res.status(400).json({ message: "userId is required!" });
         const conversations = await Conversation.find({ userId });
         if (!conversations.length) {
-            return res.status(404).json({ message: "This user doesn’t have any conversations yet!" });
+            return res.status(200).json({ message: "This user doesn’t have any conversations yet!" });
         }
         return res.status(200).json({ conversations });
     } catch (error) {
@@ -55,15 +56,20 @@ export const conversationsOfUser = async (req: Request, res: Response) => {
 
 export const deleteConversation = async (req: Request, res: Response) => {
     try {
-        const { userId, conversation } = req.params;
-        if (!userId || !conversation) {
-            return res.status(400).json({ message: "userId and conversation are required!" });
+        const { userId, conversationId } = req.params;
+        if (!userId || !conversationId) {
+            return res.status(400).json({ message: "userId and conversationId are required!" });
         }
-        const deletedConversation = await Conversation.deleteOne({ userId, conversation });
+        const userObjectId = new mongoose.Types.ObjectId(userId);
+        const conversationObjectId = new mongoose.Types.ObjectId(conversationId);
+        const deletedConversation = await Conversation.deleteOne({
+            userId: userObjectId,
+            _id: conversationObjectId,
+        });
         if (deletedConversation.deletedCount > 0) {
             return res.status(200).json({ message: "Conversation deleted successfully!" });
         } else {
-            return res.status(200).json({ message: "Conversation already deleted before" });
+            return res.status(404).json({ message: "Conversation not found" });
         }
     } catch (error) {
         return res.status(500).json({ message: error instanceof Error ? error.message : String(error) });

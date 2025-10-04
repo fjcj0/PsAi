@@ -1,3 +1,4 @@
+import { inputSettingProps } from '@/type';
 import React, { FC } from 'react';
 const Input: FC<inputSettingProps> = ({ type, placeholder, isActive, text, setText }) => {
     return (

@@ -1,4 +1,5 @@
 import Button from '@/app/components/Button';
+import { contentProps } from '@/type';
 import Image from 'next/image';
 import React from 'react';
 const Content = ({
