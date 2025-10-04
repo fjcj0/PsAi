@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import useSlideStore from "@/store/slideStore";
-import { MoreVertical, Trash, MessageCircle, List, Settings, XIcon } from "lucide-react";
+import { MoreVertical, MessageCircle, List, Settings, XIcon } from "lucide-react";
 import { useMessage } from "@/app/context/MessageContext";
 import { useMessageStore } from "@/store/messageStore";
 import { ConversationType } from "@/type";
 import { useAuth } from "@/app/context/UserContext";
+import Loading from "@/app/animations/Loading";
 const Slider = () => {
-    const { conversationsUser, getConversations, deleteConversation } = useMessageStore();
+    const { conversationsUser, getConversations, deleteConversation, isLoadingConversations } = useMessageStore();
     const { user } = useAuth();
     const { setConversation } = useMessage();
     const { isSlideOpen, toggleSlide } = useSlideStore();
@@ -33,11 +34,11 @@ const Slider = () => {
     return (
         <div
             className={`fixed top-0 left-0 h-screen overflow-y-auto transition-all duration-300 z-10 flex flex-col justify-between bg-slate-950 md:bg-slate-800/20 text-white
-        ${isSlideOpen ? "w-[15rem]" : "w-0"} 
-        ${isSlideOpen ? "md:w-[15rem]" : "md:w-[5rem]"}
+      ${isSlideOpen ? "w-[15rem]" : "w-0"} 
+      ${isSlideOpen ? "md:w-[15rem]" : "md:w-[5rem]"}
       `}
         >
-            <div className={`md:hidden z-50 text-white/50 text-sm hover:text-white duration-300 top-[3.5rem] left-[1.5rem] ${isSlideOpen ? 'hidden' : 'fixed'}`}>
+            <div className={`md:hidden z-50 text-white/50 text-sm hover:text-white duration-300 top-[3.5rem] left-[1.5rem] ${isSlideOpen ? "hidden" : "fixed"}`}>
                 <button onClick={toggleSlide}><List /></button>
             </div>
             <div className="flex flex-col gap-10 w-full p-5">
@@ -54,7 +55,9 @@ const Slider = () => {
                 </div>
             </div>
             <div className={`gap-4 overflow-y-scroll scrollbar-hide max-h-[40rem] mt-5 ${isSlideOpen ? "flex flex-col" : "hidden"} p-5`}>
-                {conversationsUser.length === 0 ? (
+                {isLoadingConversations ? (
+                    <Loading />
+                ) : conversationsUser.length === 0 ? (
                     <p className="text-white/40 text-sm">No conversations yet.</p>
                 ) : (
                     conversationsUser.map((conv: ConversationType, index: number) => (
@@ -94,7 +97,7 @@ const Slider = () => {
             </div>
             <div className="w-full flex justify-end mt-auto p-5">
                 <button
-                    onClick={() => (window.location.href = '/setting')}
+                    onClick={() => (window.location.href = "/setting")}
                     className="text-white/50 flex items-center gap-2 text-sm hover:text-white duration-300"
                 >
                     <Settings />

@@ -2,7 +2,6 @@ import React from 'react';
 import Home from './components/Home';
 import Header from './components/Header';
 import Footer from './components/Footer';
-
 const Page = () => {
     return (
         <main className='bg-black'>
@@ -12,5 +11,4 @@ const Page = () => {
         </main>
     );
 }
-
 export default Page;

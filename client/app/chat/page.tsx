@@ -1,7 +1,6 @@
 import React from 'react';
 import Messages from './components/Messages';
 import Input from './components/Input';
-
 const Page = () => {
     return (
         <div className='w-full flex flex-col items-center justify-end h-full'>
@@ -14,5 +13,4 @@ const Page = () => {
         </div>
     )
 }
-
 export default Page;
