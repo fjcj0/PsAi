@@ -30,7 +30,6 @@ const Input = () => {
                 placeholder="Ask us anything in your mind...."
             />
 
-            {/* hidden image input */}
             <input
                 type="file"
                 accept="image/*"

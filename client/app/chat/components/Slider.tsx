@@ -87,7 +87,7 @@ const Slider = () => {
                     </button>
                 </div>
             </div>
-            <div className={`gap-4 overflow-y-scroll max-h-[40rem] mt-5 ${isSlideOpen ? "flex flex-col" : "hidden"} p-5`}>
+            <div className={`gap-4 overflow-y-scroll scrollbar-hide max-h-[40rem] mt-5 ${isSlideOpen ? "flex flex-col" : "hidden"} p-5`}>
                 {conversations.map((conv, index) => (
                     <div
                         key={index}
