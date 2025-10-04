@@ -21,11 +21,12 @@ const Slider = () => {
         const conv = conversationsUser[index];
         if (!conv || !user?._id) return;
         deleteConversation(user._id, conv._id);
+        setConversation(null);
         setActiveIndex(null);
     };
     const onChangeConversation = (index: number) => {
         const conv = conversationsUser[index];
-        if (conv) setConversation(conv.conversation);
+        if (conv) setConversation(conv._id);
     };
     const onClickNewChat = () => setConversation(null);
     if (!mounted) return null;

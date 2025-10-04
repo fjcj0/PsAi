@@ -14,7 +14,7 @@ router.post(
 
 router.get('/conversations', verifySession, conversationsOfUser);
 
-router.post('/get-messages', verifySession, getMessagesByConversation);
+router.get('/get-messages/:userId/:conversationId', verifySession, getMessagesByConversation);
 
 router.delete('/delete-conversation/:userId/:conversationId', verifySession, deleteConversation);
 
