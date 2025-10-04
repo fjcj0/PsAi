@@ -15,7 +15,7 @@ const Messages = () => {
     const { conversation } = useMessage();
     const [messages, setMessages] = useState<Message[]>([]);
     const { user } = useAuthStore();
-    const { getMessages, messagesInConversation, isLoadingMessages } = useMessageStore();
+    const { getMessages, messagesInConversation, isLoadingMessages, isLoadingAi } = useMessageStore();
     const [loadingMain, setLoadingMain] = useState(false);
     useEffect(() => {
         setLoadingMain(true);
@@ -102,6 +102,14 @@ const Messages = () => {
                             </div>
                         );
                     })}
+                    {
+                        isLoadingAi && <div className="flex flex-col items-start">
+                            <div className="flex flex-row gap-2 items-center justify-center">
+                                <Image src={avatars[3]} width={40} height={40} alt={'ai'} className="rounded-full" />
+                                <Loading />
+                            </div>
+                        </div>
+                    }
                 </div>
             )}
         </div>

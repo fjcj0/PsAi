@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
-import { MessageStore } from "@/type";
+import { MessageStore, MessageType } from "@/type";
+import { socket } from "@/utils/socket";
 axios.defaults.withCredentials = true;
 const API_URL = "/api/message";
 export const useMessageStore = create<MessageStore>((set) => ({
@@ -15,7 +16,7 @@ export const useMessageStore = create<MessageStore>((set) => ({
             const res = await axios.get(`${API_URL}/conversations?userId=${userId}`);
             set({ conversationsUser: res.data?.conversations || [] });
         } catch (error) {
-            console.log("Failed to fetch conversations:", error);
+            console.error("Failed to fetch conversations:", error);
             set({ conversationsUser: [] });
         } finally {
             set({ isLoadingConversations: false });
@@ -26,9 +27,7 @@ export const useMessageStore = create<MessageStore>((set) => ({
         try {
             await axios.delete(`${API_URL}/delete-conversation/${userId}/${conversationId}`);
             set((state) => ({
-                conversationsUser: state.conversationsUser.filter(
-                    (conv) => conv._id !== conversationId
-                ),
+                conversationsUser: state.conversationsUser.filter((conv) => conv._id !== conversationId),
             }));
         } catch (error) {
             console.error("Failed to delete conversation:", error);
@@ -40,13 +39,57 @@ export const useMessageStore = create<MessageStore>((set) => ({
         set({ isLoadingMessages: true });
         try {
             const res = await axios.get(`${API_URL}/get-messages/${userId}/${conversationId}`);
-            console.log("Messages response:", res.data);
             set({ messagesInConversation: res.data?.messages || [] });
         } catch (error) {
-            console.log("Failed to fetch messages:", error);
+            console.error("Failed to fetch messages:", error);
             set({ messagesInConversation: [] });
         } finally {
             set({ isLoadingMessages: false });
         }
+    },
+    sendMessageToAi: (userId: string, message: string, conversationId?: string) => {
+        if (!userId || !message.trim()) return;
+        const tempId = `temp-${Date.now()}`;
+        const userMessage: MessageType = {
+            _id: tempId,
+            conversationId: conversationId || null,
+            userId,
+            role: "user",
+            content: message,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        set((state) => ({
+            messagesInConversation: [...state.messagesInConversation, userMessage],
+            isLoadingAi: true,
+        }));
+        socket.off("receiveMessage");
+        socket.off("errorMessage");
+        socket.on("receiveMessage", (data) => {
+            const { message: msg, conversation } = data;
+            if (conversation) {
+                set((state) => ({
+                    conversationsUser: [conversation, ...state.conversationsUser],
+                    messagesInConversation: state.messagesInConversation.map((m) =>
+                        m._id === tempId ? { ...m, _id: msg._id, conversationId: conversation._id } : m
+                    ),
+                }));
+            }
+            if (msg.role === "ai") {
+                set((state) => ({
+                    messagesInConversation: [...state.messagesInConversation, msg],
+                    isLoadingAi: false,
+                }));
+            }
+        });
+        socket.on("errorMessage", (err) => {
+            console.error("AI Error:", err);
+            set({ isLoadingAi: false });
+        });
+        socket.emit("sendMessageToAi", {
+            userId,
+            message,
+            conversation: conversationId,
+        });
     },
 }));

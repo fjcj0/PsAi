@@ -14,28 +14,19 @@ import { createServer } from "http";
 import { Message } from "../models/message.model";
 import { callAiApi } from "../utils/callAiApi";
 import { Conversation } from "../models/conversation.model";
-
 const PORT = process.env.PORT || 5205;
-
 const MongoUrl = process.env.MONGO_URL;
-
 if (!MongoUrl) throw new Error(chalk.red.bold("MONGO_URL not defined"));
-
 const app = express();
-
 app.use(
     cors({
         origin: "http://localhost:3000",
         credentials: true,
     })
 );
-
 app.use(express.urlencoded({ extended: true }));
-
 app.use(express.json());
-
 app.use(cookieParser());
-
 app.use(
     session({
         secret: process.env.SESSION_SECRET || "secret",
@@ -48,17 +39,11 @@ app.use(
         },
     })
 );
-
 app.use(passport.initialize());
-
 app.use(passport.session());
-
 app.use("/api/auth", authRoutes);
-
 app.use("/api/message", messageRoutes);
-
 const httpServer = createServer(app);
-
 const io = new Server(httpServer, {
     cors: {
         origin: "http://localhost:3000",
@@ -66,7 +51,6 @@ const io = new Server(httpServer, {
         credentials: true,
     },
 });
-
 io.on("connection", (socket) => {
     console.log(`New client connected: ${socket.id}`);
     socket.on("sendMessageToAi", async (data) => {
@@ -109,7 +93,6 @@ io.on("connection", (socket) => {
         console.log(`Client disconnected: ${socket.id}`);
     });
 });
-
 httpServer.listen(PORT, async () => {
     try {
         await connectDB();

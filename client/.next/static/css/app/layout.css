@@ -838,11 +838,11 @@ video {
   border-bottom-right-radius: 9999px;
   border-bottom-left-radius: 9999px;
 }
-.border-\[0\.5px\] {
-  border-width: 0.5px;
-}
 .border {
   border-width: 1px;
+}
+.border-\[0\.5px\] {
+  border-width: 0.5px;
 }
 .border-gray-200 {
   --tw-border-opacity: 1;

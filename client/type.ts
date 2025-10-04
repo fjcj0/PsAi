@@ -50,17 +50,31 @@ export interface User {
     email?: string;
     image?: string;
 }
+export interface MessageType {
+    _id: string;
+    conversationId?: string | null;
+    userId: string;
+    role: "user" | "ai";
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    image?: string;
+}
 export interface ConversationType {
     _id: string;
+    userId: string;
     conversation: string;
+    createdAt: string;
+    updatedAt: string;
 }
 export interface MessageStore {
     conversationsUser: ConversationType[];
-    messagesInConversation: any[];
+    messagesInConversation: MessageType[];
     isLoadingMessages: boolean;
     isLoadingAi: boolean;
     isLoadingConversations: boolean;
     getConversations: (userId: string) => Promise<void>;
     deleteConversation: (userId: string, conversationId: string) => Promise<void>;
     getMessages: (userId: string, conversationId: string) => Promise<void>;
+    sendMessageToAi: (userId: string, message: string, conversationId?: string) => void;
 }

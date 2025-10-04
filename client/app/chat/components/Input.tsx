@@ -5,10 +5,11 @@ import { useMessage } from '../../context/MessageContext';
 import Image from 'next/image';
 import { useMessageStore } from '@/store/messageStore';
 import { useAuth } from '@/app/context/UserContext';
+import Loading from '@/app/animations/Loading';
 const Input = () => {
     const { user } = useAuth();
     const { message, setMessage, conversation } = useMessage();
-    const { sendMessage } = useMessageStore();
+    const { sendMessageToAi, isLoadingAi } = useMessageStore();
     const [preview, setPreview] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,13 +27,13 @@ const Input = () => {
         setPreview(null);
         setFile(null);
     };
-    const onSendMessage = async () => {
-        try {
-
-        } catch (error) {
-            console.log(error);
-        }
+    const onSendMessage = () => {
+        if (!user || !message.trim()) return;
+        sendMessageToAi(user._id, message, conversation ? conversation : undefined);
+        setMessage("");
+        removeImage();
     };
+    console.log(conversation);
     return (
         <div className="relative w-full flex flex-row px-3 py-4 rounded-xl justify-between text-white/30 bg-slate-700/20">
             <input
@@ -54,11 +55,12 @@ const Input = () => {
                     <ImageIcon size={20} />
                 </label>
                 <button
+                    disabled={isLoadingAi}
                     type="button"
                     onClick={onSendMessage}
                     className="hover:text-white duration-300"
                 >
-                    <Send size={20} />
+                    {isLoadingAi ? <Loading /> : <Send size={20} />}
                 </button>
             </div>
             {preview && (
@@ -74,8 +76,7 @@ const Input = () => {
                         <div className="absolute top-1 right-1">
                             <button
                                 onClick={removeImage}
-                                className="rounded-full flex items-center justify-center w-[1.5rem] h-[1.5rem] bg-white hover:bg-white/10 duration-300 hover:text-white"
-                            >
+                                className="rounded-full flex items-center justify-center w-[1.5rem] h-[1.5rem] bg-white hover:bg-white/10 duration-300 hover:text-white">
                                 <XIcon size={15} color="black" />
                             </button>
                         </div>
