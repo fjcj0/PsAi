@@ -25,6 +25,11 @@ export const useMessageStore = create<MessageStore>((set) => ({
         set({ isLoadingConversations: true });
         try {
             await axios.delete(`${API_URL}/delete-conversation/${userId}/${conversationId}`, { withCredentials: true });
+            set((state) => ({
+                conversationsUser: state.conversationsUser.filter(
+                    (conv) => conv._id !== conversationId
+                ),
+            }));
         } catch (error) {
             console.error("Failed to delete conversation:", error);
         } finally {
