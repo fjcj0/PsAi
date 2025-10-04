@@ -21,12 +21,12 @@ const Header = () => {
     };
     if (!mounted) return null;
     return (
-        <div className="w-full flex items-center justify-between px-20 py-6">
+        <div className="w-full flex items-center justify-between px-20 py-3">
             <Image
                 src={"/earthlogo.png"}
                 alt="earthlogo"
-                width={110}
-                height={110}
+                width={80}
+                height={80}
                 className="rounded-full"
             />
             {loading ? (

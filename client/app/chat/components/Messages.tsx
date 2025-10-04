@@ -19,21 +19,14 @@ const Messages = () => {
     const [loadingMain, setLoadingMain] = useState(false);
     useEffect(() => {
         setLoadingMain(true);
-        const timer = setTimeout(() => {
-            setLoadingMain(false);
-        }, 3000);
+        const timer = setTimeout(() => setLoadingMain(false), 3000);
         return () => clearTimeout(timer);
     }, []);
     useEffect(() => {
-        if (conversation && user?._id) {
-            getMessages(user._id, conversation);
-        } else {
-            setMessages([]);
-        }
+        if (conversation && user?._id) getMessages(user._id, conversation);
+        else setMessages([]);
     }, [conversation, user?._id, getMessages]);
-    useEffect(() => {
-        setMessages(messagesInConversation);
-    }, [messagesInConversation]);
+    useEffect(() => setMessages(messagesInConversation), [messagesInConversation]);
     if (!conversation) {
         return loadingMain ? (
             <div className="flex justify-center items-center h-full">
@@ -48,8 +41,7 @@ const Messages = () => {
                     </span>
                 </h1>
                 <p className="text-sm text-white/70 leading-relaxed max-w-2xl">
-                    Ask anything — we’re here to help you. Whether it’s coding, design, or problem-solving,
-                    just type your question below and we’ll get started right away.
+                    Ask anything — we’re here to help you. Whether it’s coding, design, or problem-solving, just type your question below.
                 </p>
                 <div className="grid lg:grid-cols-4 grid-cols-2 gap-10">
                     {avatars.map((avatar, index) => (
@@ -92,24 +84,21 @@ const Messages = () => {
                                 )}
                                 <div className={`flex items-start ${isUser ? "flex-row-reverse" : "flex-row"} gap-2`}>
                                     <Image src={avatarSrc} width={40} height={40} alt={msg.role} className="rounded-full" />
-                                    <div
-                                        className={`p-3 rounded-xl max-w-xs ${isUser ? "bg-blue-500 text-white" : "bg-gray-800 text-white"
-                                            }`}
-                                    >
+                                    <div className={`p-3 rounded-xl max-w-xs ${isUser ? "bg-blue-500 text-white" : "bg-gray-800 text-white"}`}>
                                         {msg.content}
                                     </div>
                                 </div>
                             </div>
                         );
                     })}
-                    {
-                        isLoadingAi && <div className="flex flex-col items-start">
+                    {isLoadingAi && (
+                        <div className="flex flex-col items-start">
                             <div className="flex flex-row gap-2 items-center justify-center">
-                                <Image src={avatars[3]} width={40} height={40} alt={'ai'} className="rounded-full" />
+                                <Image src={avatars[3]} width={40} height={40} alt={"ai"} className="rounded-full" />
                                 <Loading />
                             </div>
                         </div>
-                    }
+                    )}
                 </div>
             )}
         </div>

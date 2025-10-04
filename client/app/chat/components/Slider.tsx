@@ -7,6 +7,7 @@ import { useMessageStore } from "@/store/messageStore";
 import { ConversationType } from "@/type";
 import { useAuth } from "@/app/context/UserContext";
 import Loading from "@/app/animations/Loading";
+
 const Slider = () => {
     const { conversationsUser, getConversations, deleteConversation, isLoadingConversations } = useMessageStore();
     const { user } = useAuth();
@@ -14,10 +15,10 @@ const Slider = () => {
     const { isSlideOpen, toggleSlide } = useSlideStore();
     const [mounted, setMounted] = useState(false);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
-    useEffect(() => {
-        if (user?._id) getConversations(user._id);
-    }, [user, getConversations]);
+
+    useEffect(() => { if (user?._id) getConversations(user._id); }, [user, getConversations]);
     useEffect(() => setMounted(true), []);
+
     const handleDelete = (index: number) => {
         const conv = conversationsUser[index];
         if (!conv || !user?._id) return;
@@ -25,18 +26,20 @@ const Slider = () => {
         setConversation(null);
         setActiveIndex(null);
     };
+
     const onChangeConversation = (index: number) => {
         const conv = conversationsUser[index];
         if (conv) setConversation(conv._id);
     };
+
     const onClickNewChat = () => setConversation(null);
+
     if (!mounted) return null;
+
     return (
-        <div
-            className={`fixed top-0 left-0 h-screen overflow-y-auto transition-all duration-300 z-10 flex flex-col justify-between bg-slate-950 md:bg-slate-800/20 text-white
+        <div className={`fixed top-0 left-0 h-screen overflow-y-auto transition-all duration-300 z-10 flex flex-col justify-between bg-slate-950 md:bg-slate-800/20 text-white
       ${isSlideOpen ? "w-[15rem]" : "w-0"} 
-      ${isSlideOpen ? "md:w-[15rem]" : "md:w-[5rem]"}
-      `}
+      ${isSlideOpen ? "md:w-[15rem]" : "md:w-[5rem]"}`}
         >
             <div className={`md:hidden z-50 text-white/50 text-sm hover:text-white duration-300 top-[3.5rem] left-[1.5rem] ${isSlideOpen ? "hidden" : "fixed"}`}>
                 <button onClick={toggleSlide}><List /></button>
@@ -107,4 +110,5 @@ const Slider = () => {
         </div>
     );
 };
+
 export default Slider;

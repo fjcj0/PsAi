@@ -19,10 +19,10 @@ export default function ChatLayoutClient({ children }: { children: ReactNode }) 
                     className={`absolute right-0 h-full duration-300 ${isSlideOpen ? "md:w-[calc(100%-18rem)]" : "md:w-[calc(100%-5rem)]"
                         }`}
                 >
-                    <div className="h-[18%]">
+                    <div className="h-[12%]">
                         <Header />
                     </div>
-                    <div className="flex flex-col justify-between items-center h-[82%]">
+                    <div className="flex flex-col justify-between items-center h-[88%]">
                         {children}
                     </div>
                 </div>

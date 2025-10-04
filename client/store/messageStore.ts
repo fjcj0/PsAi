@@ -47,7 +47,12 @@ export const useMessageStore = create<MessageStore>((set) => ({
             set({ isLoadingMessages: false });
         }
     },
-    sendMessageToAi: (userId: string, message: string, conversationId?: string) => {
+    sendMessageToAi: (
+        userId: string,
+        message: string,
+        conversationId?: string,
+        setConversation?: (id: string) => void
+    ) => {
         if (!userId || !message.trim()) return;
         const tempId = `temp-${Date.now()}`;
         const userMessage: MessageType = {
@@ -74,6 +79,7 @@ export const useMessageStore = create<MessageStore>((set) => ({
                         m._id === tempId ? { ...m, _id: msg._id, conversationId: conversation._id } : m
                     ),
                 }));
+                if (setConversation) setConversation(conversation._id);
             }
             if (msg.role === "ai") {
                 set((state) => ({
@@ -86,10 +92,6 @@ export const useMessageStore = create<MessageStore>((set) => ({
             console.error("AI Error:", err);
             set({ isLoadingAi: false });
         });
-        socket.emit("sendMessageToAi", {
-            userId,
-            message,
-            conversation: conversationId,
-        });
+        socket.emit("sendMessageToAi", { userId, message, conversation: conversationId });
     },
 }));

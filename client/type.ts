@@ -73,8 +73,13 @@ export interface MessageStore {
     isLoadingMessages: boolean;
     isLoadingAi: boolean;
     isLoadingConversations: boolean;
-    getConversations: (userId: string) => Promise<void>;
-    deleteConversation: (userId: string, conversationId: string) => Promise<void>;
-    getMessages: (userId: string, conversationId: string) => Promise<void>;
-    sendMessageToAi: (userId: string, message: string, conversationId?: string) => void;
+    getConversations: (userId: string) => void;
+    deleteConversation: (userId: string, conversationId: string) => void;
+    getMessages: (userId: string, conversationId: string) => void;
+    sendMessageToAi: (
+        userId: string,
+        message: string,
+        conversationId?: string,
+        setConversation?: (id: string) => void
+    ) => void;
 }
