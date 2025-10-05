@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 const messageSchema = new mongoose.Schema(
     {
         conversationId: {
@@ -17,13 +18,15 @@ const messageSchema = new mongoose.Schema(
         },
         content: {
             type: String,
-            required: true,
+            required: false,
         },
         imageUrl: {
             type: String,
-            default: false
+            required: true,
+            default: '',
         },
     },
     { timestamps: true }
 );
+
 export const Message = mongoose.model("Message", messageSchema);

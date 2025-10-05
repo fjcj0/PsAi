@@ -80,6 +80,7 @@ export interface MessageStore {
         userId: string,
         message: string,
         conversationId?: string,
-        setConversation?: (id: string) => void
+        setConversation?: (id: string) => void,
+        imageBase64?: string
     ) => void;
 }

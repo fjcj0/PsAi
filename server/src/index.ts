@@ -13,7 +13,10 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import { Message } from "../models/message.model";
 import { callAiApi } from "../utils/callAiApi";
+import { callOrderPictureAi } from "../utils/callOrderPictureAiApi";
+import { callEditPictureAi } from "../utils/callEditPictureAi";
 import { Conversation } from "../models/conversation.model";
+import fs from 'fs';
 const PORT = process.env.PORT || 5205;
 const MongoUrl = process.env.MONGO_URL;
 if (!MongoUrl) throw new Error(chalk.red.bold("MONGO_URL not defined"));
@@ -51,20 +54,21 @@ const io = new Server(httpServer, {
         credentials: true,
     },
 });
+
 io.on("connection", (socket) => {
     console.log(`New client connected: ${socket.id}`);
     socket.on("sendMessageToAi", async (data) => {
         try {
-            const { userId, conversation, message } = data;
-            if (!userId || !message) {
-                return socket.emit("errorMessage", "userId and Message are required");
+            const { userId, conversation, message, imageBase64 } = data;
+            if (!userId || (!message && !imageBase64)) {
+                return socket.emit("errorMessage", "userId and message or image are required");
             }
             let conversationId = conversation;
             let conversationObj = null;
             if (!conversationId) {
                 const newConversation = await Conversation.create({
                     userId,
-                    conversation: message,
+                    conversation: message || "Image conversation"
                 });
                 conversationId = newConversation._id;
                 conversationObj = newConversation;
@@ -73,16 +77,49 @@ io.on("connection", (socket) => {
                 conversationId,
                 userId,
                 role: "user",
-                content: message,
+                content: message || "",
+                imageUrl: imageBase64 ? `data:image/png;base64,${imageBase64}` : undefined,
             });
-            socket.emit("receiveMessage", conversationObj ? { conversation: conversationObj, message: userMessage } : { message: userMessage });
-            const aiResponse = await callAiApi({ text: message });
-            const aiMessage = await Message.create({
-                conversationId,
-                userId,
-                role: "ai",
-                content: aiResponse.text,
-            });
+            socket.emit("receiveMessage", conversationObj
+                ? { conversation: conversationObj, message: userMessage }
+                : { message: userMessage }
+            );
+            let aiMessage;
+            const msgLower = (message || "").toLowerCase();
+            if (imageBase64 && msgLower.includes("edit") && (msgLower.includes("image") || msgLower.includes("picture"))) {
+                const tmpImagePath = `tmp-${Date.now()}.png`;
+                fs.writeFileSync(tmpImagePath, Buffer.from(imageBase64, "base64"));
+                const aiResult = await callEditPictureAi(tmpImagePath, message || "");
+                aiMessage = await Message.create({
+                    conversationId,
+                    userId,
+                    role: "ai",
+                    content: aiResult?.text || "Edited your image!",
+                    imageUrl: aiResult?.imagePath
+                        ? `data:image/png;base64,${fs.readFileSync(aiResult.imagePath).toString("base64")}`
+                        : undefined
+                });
+                fs.unlinkSync(tmpImagePath);
+            } else if (msgLower.includes("create image")) {
+                const aiResult = await callOrderPictureAi(message || "");
+                aiMessage = await Message.create({
+                    conversationId,
+                    userId,
+                    role: "ai",
+                    content: aiResult.text || "Here is your image!",
+                    imageUrl: aiResult.image
+                        ? `data:image/png;base64,${aiResult.image.toString("base64")}`
+                        : undefined
+                });
+            } else {
+                const aiResponse = await callAiApi({ text: message || "" });
+                aiMessage = await Message.create({
+                    conversationId,
+                    userId,
+                    role: "ai",
+                    content: aiResponse.text,
+                });
+            }
             socket.emit("receiveMessage", { message: aiMessage });
         } catch (error: any) {
             console.error("sendMessageToAi error:", error);
@@ -93,6 +130,7 @@ io.on("connection", (socket) => {
         console.log(`Client disconnected: ${socket.id}`);
     });
 });
+
 httpServer.listen(PORT, async () => {
     try {
         await connectDB();

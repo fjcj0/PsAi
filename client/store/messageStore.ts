@@ -47,40 +47,44 @@ export const useMessageStore = create<MessageStore>((set) => ({
             set({ isLoadingMessages: false });
         }
     },
-    sendMessageToAi: (
-        userId: string,
-        message: string,
-        conversationId?: string,
-        setConversation?: (id: string) => void
-    ) => {
-        if (!userId || !message.trim()) return;
+    sendMessageToAi: (userId, message, conversationId?, setConversation?, imageBase64?) => {
+        if (!userId || (!message.trim() && !imageBase64)) return;
+
         const tempId = `temp-${Date.now()}`;
         const userMessage: MessageType = {
             _id: tempId,
             conversationId: conversationId || null,
             userId,
             role: "user",
-            content: message,
+            content: message || "",
+            image: imageBase64,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };
+
         set((state) => ({
             messagesInConversation: [...state.messagesInConversation, userMessage],
             isLoadingAi: true,
         }));
+
         socket.off("receiveMessage");
         socket.off("errorMessage");
+
         socket.on("receiveMessage", (data) => {
             const { message: msg, conversation } = data;
+
             if (conversation) {
                 set((state) => ({
                     conversationsUser: [conversation, ...state.conversationsUser],
                     messagesInConversation: state.messagesInConversation.map((m) =>
-                        m._id === tempId ? { ...m, _id: msg._id, conversationId: conversation._id } : m
+                        m._id === tempId
+                            ? { ...m, _id: msg._id, conversationId: conversation._id }
+                            : m
                     ),
                 }));
                 if (setConversation) setConversation(conversation._id);
             }
+
             if (msg.role === "ai") {
                 set((state) => ({
                     messagesInConversation: [...state.messagesInConversation, msg],
@@ -88,10 +92,13 @@ export const useMessageStore = create<MessageStore>((set) => ({
                 }));
             }
         });
+
         socket.on("errorMessage", (err) => {
             console.error("AI Error:", err);
             set({ isLoadingAi: false });
         });
-        socket.emit("sendMessageToAi", { userId, message, conversation: conversationId });
+
+        socket.emit("sendMessageToAi", { userId, message, conversation: conversationId, image: imageBase64 });
     },
+
 }));

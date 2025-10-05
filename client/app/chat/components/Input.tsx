@@ -12,28 +12,23 @@ const Input = () => {
     const { message, setMessage, conversation, setConversation } = useMessage();
     const { sendMessageToAi, isLoadingAi } = useMessageStore();
     const [preview, setPreview] = useState<string | null>(null);
-    const [file, setFile] = useState<File | null>(null);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            const selectedFile = e.target.files[0];
-            setFile(selectedFile);
+            const file = e.target.files[0];
             const reader = new FileReader();
             reader.onload = () => {
                 if (reader.result) setPreview(reader.result as string);
             };
-            reader.readAsDataURL(selectedFile);
+            reader.readAsDataURL(file);
         }
     };
 
-    const removeImage = () => {
-        setPreview(null);
-        setFile(null);
-    };
+    const removeImage = () => setPreview(null);
 
     const onSendMessage = () => {
-        if (!user || !message.trim()) return;
-        sendMessageToAi(user._id, message, conversation ?? undefined, setConversation);
+        if (!user || (!message.trim() && !preview)) return;
+        sendMessageToAi(user._id, message, conversation ?? undefined, setConversation, preview || undefined);
         setMessage("");
         removeImage();
     };
@@ -45,7 +40,7 @@ const Input = () => {
                 onChange={(e) => setMessage(e.target.value)}
                 type="text"
                 className="w-[60%] bg-transparent text-sm outline-none placeholder:text-white/30 placeholder:text-sm"
-                placeholder="Ask us anything in your mind...."
+                placeholder="Ask us anything..."
             />
             <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" id="image-upload" />
             <div className="flex flex-row gap-3 items-center">
@@ -60,14 +55,9 @@ const Input = () => {
                 <div className="absolute bottom-full mb-2">
                     <div className="relative">
                         <Image src={preview} alt="preview" width={100} height={100} className="rounded-xl" />
-                        <div className="absolute top-1 right-1">
-                            <button
-                                onClick={removeImage}
-                                className="rounded-full flex items-center justify-center w-[1.5rem] h-[1.5rem] bg-white hover:bg-white/10 duration-300 hover:text-white"
-                            >
-                                <XIcon size={15} color="black" />
-                            </button>
-                        </div>
+                        <button onClick={removeImage} className="absolute top-1 right-1 rounded-full w-6 h-6 bg-white flex items-center justify-center hover:bg-white/10">
+                            <XIcon size={15} color="black" />
+                        </button>
                     </div>
                 </div>
             )}
