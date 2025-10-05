@@ -5,14 +5,77 @@ import { useMessage } from "../../context/MessageContext";
 import { useAuthStore } from "@/store/authStore";
 import { useMessageStore } from "@/store/messageStore";
 import Loading from "@/app/animations/Loading";
-
 type Message = {
     role: "user" | "ai";
     content: string;
     image?: string;
     imageUrl?: string;
 };
+const formatContent = (content: string) => {
+    if (!content) return null;
 
+    // Remove Markdown symbols: ** and `
+    let cleanedText = content.replace(/(\*\*|`)/g, '');
+
+    // Add a line break before code blocks
+    cleanedText = cleanedText.replace(/(^|\n)(cpp|```cpp)/g, '$1<br />$2');
+
+    // Add a line break before each closing brace
+    cleanedText = cleanedText.replace(/}/g, '<br>}');
+
+    // Split into lines instead of splitting on periods
+    const lines = cleanedText.split(/\n/);
+
+    const highlightComments = (text: string) => {
+        return text
+            .replace(/(\/\/.*)/g, '<span style="color: green;">$1</span><br />')
+            .replace(/(\/\*[\s\S]*?\*\/)/g, '<span style="color: green;">$1</span><br />');
+    };
+
+    return lines.map((line, idx) => {
+        const trimmed = line.trim();
+
+        // Numbered list items
+        const isNumberedList = /^\d+\.\s/.test(trimmed);
+
+        // Code block lines
+        const isCode = /^cpp/.test(trimmed);
+
+        if (isNumberedList) {
+            // Wrap numbered items in a block with spacing
+            return (
+                <div key={idx} style={{ marginBottom: '1em' }}>
+                    <span dangerouslySetInnerHTML={{ __html: highlightComments(trimmed) }} />
+                </div>
+            );
+        }
+
+        if (isCode) {
+            return (
+                <pre
+                    key={idx}
+                    style={{
+                        background: '#1e1e1e',
+                        color: '#fff',
+                        padding: '10px',
+                        borderRadius: '8px',
+                        overflowX: 'auto',
+                    }}
+                >
+                    <span dangerouslySetInnerHTML={{ __html: highlightComments(trimmed) }} />
+                </pre>
+            );
+        }
+
+        // Normal text
+        return (
+            <span key={idx}>
+                <span dangerouslySetInnerHTML={{ __html: highlightComments(trimmed) }} />
+                <br />
+            </span>
+        );
+    });
+};
 const Messages = () => {
     const avatars = ["/logoman.png", "/logowoman.png", "/Morgan.png", "/earthlogo.png"];
     const { conversation } = useMessage();
@@ -61,9 +124,8 @@ const Messages = () => {
             </div>
         );
     }
-
     return (
-        <div className="w-full flex flex-col gap-4 px-4 py-6">
+        <div className="w-full h-screen flex flex-col gap-4 px-4 py-6 overflow-y-auto">
             {isLoadingMessages ? (
                 <div className="flex justify-center py-10"><Loading /></div>
             ) : messages.length === 0 ? (
@@ -74,12 +136,11 @@ const Messages = () => {
                         const isUser = msg.role === "user";
                         const avatarSrc = isUser ? user?.image || avatars[0] : avatars[3];
                         const msgImage = msg.image || msg.imageUrl;
-
                         return (
                             <div key={idx} className={`flex flex-col gap-3 ${isUser ? "items-end" : "items-start"}`}>
                                 {msgImage && msgImage !== "false" && msgImage !== "" && (
                                     <Image
-                                        src={msgImage as string}
+                                        src={msgImage}
                                         width={150}
                                         height={150}
                                         alt="message image"
@@ -90,8 +151,8 @@ const Messages = () => {
                                 {msg.content && (
                                     <div className={`flex items-start ${isUser ? "flex-row-reverse" : "flex-row"} gap-2`}>
                                         <Image src={avatarSrc} width={40} height={40} alt={msg.role} className="rounded-full" />
-                                        <div className={`p-3 rounded-xl max-w-xs ${isUser ? "bg-blue-500 text-white" : "bg-gray-800 text-white"}`}>
-                                            {msg.content}
+                                        <div className={`p-3 rounded-xl ${isUser ? "bg-blue-500 text-white lg:w-[50%] w-[100%]" : "bg-gray-800 text-white lg:w-[50%] w-[100%]"}`}>
+                                            {formatContent(msg?.content)}
                                         </div>
                                     </div>
                                 )}
@@ -99,9 +160,9 @@ const Messages = () => {
                         );
                     })}
                     {isLoadingAi && (
-                        <div className="flex flex-col items-start">
-                            <div className="flex flex-row gap-2 items-center justify-center">
-                                <Image src={avatars[3]} width={40} height={40} alt={"ai"} className="rounded-full" />
+                        <div className="flex flex-col items-start mt-2">
+                            <div className="flex flex-row gap-2 items-center">
+                                <Image src={avatars[3]} width={40} height={40} alt="ai" className="rounded-full" />
                                 <Loading />
                             </div>
                         </div>
@@ -110,6 +171,7 @@ const Messages = () => {
             )}
         </div>
     );
+
 };
 
 export default Messages;

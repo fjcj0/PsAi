@@ -7,42 +7,47 @@ import { useMessageStore } from "@/store/messageStore";
 import { ConversationType } from "@/type";
 import { useAuth } from "@/app/context/UserContext";
 import Loading from "@/app/animations/Loading";
-
 const Slider = () => {
     const { conversationsUser, getConversations, deleteConversation, isLoadingConversations } = useMessageStore();
     const { user } = useAuth();
-    const { setConversation } = useMessage();
+    const { conversation, setConversation } = useMessage();
     const { isSlideOpen, toggleSlide } = useSlideStore();
     const [mounted, setMounted] = useState(false);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
-    useEffect(() => { if (user?._id) getConversations(user._id); }, [user, getConversations]);
+    useEffect(() => {
+        if (user?._id) getConversations(user._id);
+    }, [user, getConversations]);
     useEffect(() => setMounted(true), []);
-
     const handleDelete = (index: number) => {
         const conv = conversationsUser[index];
         if (!conv || !user?._id) return;
         deleteConversation(user._id, conv._id);
-        setConversation(null);
-        setActiveIndex(null);
+        if (conv._id === conversation) {
+            setConversation(null);
+        }
+        if (activeIndex === index) {
+            setActiveIndex(null);
+        }
     };
-
     const onChangeConversation = (index: number) => {
         const conv = conversationsUser[index];
         if (conv) setConversation(conv._id);
     };
-
     const onClickNewChat = () => setConversation(null);
-
     if (!mounted) return null;
-
     return (
-        <div className={`fixed top-0 left-0 h-screen overflow-y-auto transition-all duration-300 z-10 flex flex-col justify-between bg-slate-950 md:bg-slate-800/20 text-white
+        <div
+            className={`fixed top-0 left-0 h-screen overflow-y-auto transition-all duration-300 z-10 flex flex-col justify-between bg-slate-950 md:bg-slate-800/20 text-white
       ${isSlideOpen ? "w-[15rem]" : "w-0"} 
       ${isSlideOpen ? "md:w-[15rem]" : "md:w-[5rem]"}`}
         >
-            <div className={`md:hidden z-50 text-white/50 text-sm hover:text-white duration-300 top-[3.5rem] left-[1.5rem] ${isSlideOpen ? "hidden" : "fixed"}`}>
-                <button onClick={toggleSlide}><List /></button>
+            <div
+                className={`md:hidden z-50 text-white/50 text-sm hover:text-white duration-300 top-[3.5rem] left-[1.5rem] ${isSlideOpen ? "hidden" : "fixed"
+                    }`}
+            >
+                <button onClick={toggleSlide}>
+                    <List />
+                </button>
             </div>
             <div className="flex flex-col gap-10 w-full p-5">
                 <div className="flex items-center justify-between">
@@ -51,7 +56,11 @@ const Slider = () => {
                     </button>
                 </div>
                 <div className="flex items-center justify-between w-full">
-                    <button type="button" onClick={onClickNewChat} className="text-white/50 flex items-center gap-2 text-sm hover:text-white duration-300">
+                    <button
+                        type="button"
+                        onClick={onClickNewChat}
+                        className="text-white/50 flex items-center gap-2 text-sm hover:text-white duration-300"
+                    >
                         <MessageCircle />
                         <span className={`${isSlideOpen ? "inline" : "hidden"} duration-300`}>New chat</span>
                     </button>
@@ -65,8 +74,10 @@ const Slider = () => {
                 ) : (
                     conversationsUser.map((conv: ConversationType, index: number) => (
                         <div
-                            key={index}
-                            className="text-white/50 hover:bg-white/30 duration-300 p-3 rounded-lg flex justify-between items-center gap-5 text-sm w-full cursor-pointer"
+                            key={conv._id}
+                            className={`text-white/50 p-3 rounded-lg flex justify-between items-center gap-5 text-sm w-full cursor-pointer
+                hover:bg-white/30 transition-colors duration-300
+                ${conv._id === conversation ? "bg-white/30 text-white" : ""}`}
                             onClick={() => onChangeConversation(index)}
                         >
                             <p>{conv.conversation || "Unnamed Conversation"}</p>
@@ -110,5 +121,4 @@ const Slider = () => {
         </div>
     );
 };
-
 export default Slider;

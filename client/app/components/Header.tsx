@@ -1,15 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/UserContext";
 import Image from "next/image";
 import React from "react";
 const Header = () => {
     const { user, isAuth, logout, loading } = useAuth();
     const [displayInfo, setDisplayInfo] = useState(false);
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => {
-        setMounted(true);
-    }, []);
     const handleGoogleSignIn = () => {
         window.location.href =
             process.env.NODE_ENV === "development"
@@ -19,7 +15,6 @@ const Header = () => {
     const handleLogout = async () => {
         await logout();
     };
-    if (!mounted) return null;
     return (
         <div className="w-full flex items-center justify-between px-20 py-3">
             <Image

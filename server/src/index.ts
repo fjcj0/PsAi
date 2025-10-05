@@ -17,19 +17,29 @@ import { callOrderPictureAi } from "../utils/callOrderPictureAiApi";
 import { callEditPictureAi } from "../utils/callEditPictureAi";
 import { Conversation } from "../models/conversation.model";
 import fs from 'fs';
+import { cleanBase64Image } from "../utils/cleanBase64";
+
 const PORT = process.env.PORT || 5205;
+
 const MongoUrl = process.env.MONGO_URL;
+
 if (!MongoUrl) throw new Error(chalk.red.bold("MONGO_URL not defined"));
+
 const app = express();
+
 app.use(
     cors({
         origin: "http://localhost:3000",
         credentials: true,
     })
 );
+
 app.use(express.urlencoded({ extended: true }));
+
 app.use(express.json());
+
 app.use(cookieParser());
+
 app.use(
     session({
         secret: process.env.SESSION_SECRET || "secret",
@@ -42,11 +52,17 @@ app.use(
         },
     })
 );
+
 app.use(passport.initialize());
+
 app.use(passport.session());
+
 app.use("/api/auth", authRoutes);
+
 app.use("/api/message", messageRoutes);
+
 const httpServer = createServer(app);
+
 const io = new Server(httpServer, {
     cors: {
         origin: "http://localhost:3000",
@@ -68,7 +84,7 @@ io.on("connection", (socket) => {
             if (!conversationId) {
                 const newConversation = await Conversation.create({
                     userId,
-                    conversation: message || "Image conversation"
+                    conversation: message || "Image conversation",
                 });
                 conversationId = newConversation._id;
                 conversationObj = newConversation;
@@ -78,39 +94,65 @@ io.on("connection", (socket) => {
                 userId,
                 role: "user",
                 content: message || "",
-                imageUrl: imageBase64 ? `data:image/png;base64,${imageBase64}` : undefined,
+                imageUrl: cleanBase64Image(imageBase64, "png"),
             });
             socket.emit("receiveMessage", conversationObj
                 ? { conversation: conversationObj, message: userMessage }
                 : { message: userMessage }
             );
-            let aiMessage;
             const msgLower = (message || "").toLowerCase();
+            let aiMessage;
             if (imageBase64 && msgLower.includes("edit") && (msgLower.includes("image") || msgLower.includes("picture"))) {
                 const tmpImagePath = `tmp-${Date.now()}.png`;
                 fs.writeFileSync(tmpImagePath, Buffer.from(imageBase64, "base64"));
-                const aiResult = await callEditPictureAi(tmpImagePath, message || "");
-                aiMessage = await Message.create({
-                    conversationId,
-                    userId,
-                    role: "ai",
-                    content: aiResult?.text || "Edited your image!",
-                    imageUrl: aiResult?.imagePath
-                        ? `data:image/png;base64,${fs.readFileSync(aiResult.imagePath).toString("base64")}`
-                        : undefined
-                });
+                try {
+                    const aiResult = await callEditPictureAi(tmpImagePath, message || "");
+                    if (!aiResult || (!aiResult.text && !aiResult.imagePath)) {
+                        throw new Error("Can't edit on image free trial end!!");
+                    }
+                    aiMessage = await Message.create({
+                        conversationId,
+                        userId,
+                        role: "ai",
+                        content: aiResult.text || "Edited your image!",
+                        imageUrl: aiResult.imagePath
+                            ? `data:image/png;base64,${fs.readFileSync(aiResult.imagePath).toString("base64")}`
+                            : null,
+                    });
+                } catch (err) {
+                    aiMessage = await Message.create({
+                        conversationId,
+                        userId,
+                        role: "ai",
+                        content: "Can't edit on image free trial end!!",
+                        imageUrl: null,
+                    });
+                }
                 fs.unlinkSync(tmpImagePath);
-            } else if (msgLower.includes("create image")) {
-                const aiResult = await callOrderPictureAi(message || "");
-                aiMessage = await Message.create({
-                    conversationId,
-                    userId,
-                    role: "ai",
-                    content: aiResult.text || "Here is your image!",
-                    imageUrl: aiResult.image
-                        ? `data:image/png;base64,${aiResult.image.toString("base64")}`
-                        : undefined
-                });
+            } else if (msgLower.includes("create image") || msgLower.includes("create picture")) {
+                try {
+                    const aiResult = await callOrderPictureAi(message || "");
+                    if (!aiResult || (!aiResult.text && !aiResult.image)) {
+                        throw new Error("Can't edit on image free trial end!!");
+                    }
+                    aiMessage = await Message.create({
+                        conversationId,
+                        userId,
+                        role: "ai",
+                        content: aiResult.text || "Here is your image!",
+                        imageUrl: aiResult.image
+                            ? `data:image/png;base64,${aiResult.image.toString("base64")}`
+                            : null,
+                    });
+                } catch (err) {
+                    aiMessage = await Message.create({
+                        conversationId,
+                        userId,
+                        role: "ai",
+                        content: "Can't edit on image free trial end!!",
+                        imageUrl: null,
+                    });
+                }
             } else {
                 const aiResponse = await callAiApi({ text: message || "" });
                 aiMessage = await Message.create({
@@ -118,11 +160,12 @@ io.on("connection", (socket) => {
                     userId,
                     role: "ai",
                     content: aiResponse.text,
+                    imageUrl: null,
                 });
             }
             socket.emit("receiveMessage", { message: aiMessage });
         } catch (error: any) {
-            console.error("sendMessageToAi error:", error);
+            console.log("sendMessageToAi error:", error);
             socket.emit("errorMessage", error.message || "Failed to send message to AI");
         }
     });

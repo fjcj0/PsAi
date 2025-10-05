@@ -52,14 +52,15 @@ export interface User {
 }
 export interface MessageType {
     _id: string;
-    conversationId?: string | null;
+    conversationId: string | null;
     userId: string;
     role: "user" | "ai";
     content: string;
-    createdAt: string;
-    updatedAt: string;
-    image?: string;
+    imageUrl?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
 }
+
 export interface ConversationType {
     _id: string;
     userId: string;
@@ -81,6 +82,6 @@ export interface MessageStore {
         message: string,
         conversationId?: string,
         setConversation?: (id: string) => void,
-        imageBase64?: string
+        imageUrl?: string | null
     ) => void;
 }

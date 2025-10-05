@@ -16,7 +16,7 @@ export const useMessageStore = create<MessageStore>((set) => ({
             const res = await axios.get(`${API_URL}/conversations?userId=${userId}`);
             set({ conversationsUser: res.data?.conversations || [] });
         } catch (error) {
-            console.error("Failed to fetch conversations:", error);
+            console.log("Failed to fetch conversations:", error);
             set({ conversationsUser: [] });
         } finally {
             set({ isLoadingConversations: false });
@@ -30,7 +30,7 @@ export const useMessageStore = create<MessageStore>((set) => ({
                 conversationsUser: state.conversationsUser.filter((conv) => conv._id !== conversationId),
             }));
         } catch (error) {
-            console.error("Failed to delete conversation:", error);
+            console.log("Failed to delete conversation:", error);
         } finally {
             set({ isLoadingConversations: false });
         }
@@ -41,15 +41,14 @@ export const useMessageStore = create<MessageStore>((set) => ({
             const res = await axios.get(`${API_URL}/get-messages/${userId}/${conversationId}`);
             set({ messagesInConversation: res.data?.messages || [] });
         } catch (error) {
-            console.error("Failed to fetch messages:", error);
+            console.log("Failed to fetch messages:", error);
             set({ messagesInConversation: [] });
         } finally {
             set({ isLoadingMessages: false });
         }
     },
     sendMessageToAi: (userId, message, conversationId?, setConversation?, imageBase64?) => {
-        if (!userId || (!message.trim() && !imageBase64)) return;
-
+        if (!userId || (!message?.trim() && !imageBase64)) return;
         const tempId = `temp-${Date.now()}`;
         const userMessage: MessageType = {
             _id: tempId,
@@ -57,19 +56,14 @@ export const useMessageStore = create<MessageStore>((set) => ({
             userId,
             role: "user",
             content: message || "",
-            image: imageBase64,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            imageUrl: imageBase64 || null,
         };
-
         set((state) => ({
             messagesInConversation: [...state.messagesInConversation, userMessage],
             isLoadingAi: true,
         }));
-
         socket.off("receiveMessage");
         socket.off("errorMessage");
-
         socket.on("receiveMessage", (data) => {
             const { message: msg, conversation } = data;
 
@@ -84,7 +78,6 @@ export const useMessageStore = create<MessageStore>((set) => ({
                 }));
                 if (setConversation) setConversation(conversation._id);
             }
-
             if (msg.role === "ai") {
                 set((state) => ({
                     messagesInConversation: [...state.messagesInConversation, msg],
@@ -92,13 +85,11 @@ export const useMessageStore = create<MessageStore>((set) => ({
                 }));
             }
         });
-
         socket.on("errorMessage", (err) => {
-            console.error("AI Error:", err);
+            console.log("AI Error:", err);
             set({ isLoadingAi: false });
         });
 
-        socket.emit("sendMessageToAi", { userId, message, conversation: conversationId, image: imageBase64 });
+        socket.emit("sendMessageToAi", { userId, message, conversation: conversationId, imageBase64 });
     },
-
 }));
