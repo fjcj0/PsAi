@@ -18,7 +18,7 @@ export const logoutUser = (request: Request, response: Response, next: NextFunct
             sameSite: "strict",
             secure: process.env.NODE_ENV !== "development",
         });
-        response.redirect("http://localhost:3000");
+        response.redirect(`${process.env.CLIENT_URL}`);
     });
 };
 
