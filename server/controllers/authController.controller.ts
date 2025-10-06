@@ -2,14 +2,18 @@ import { Request, Response, NextFunction } from "express";
 import { User } from "../models/user.model";
 import cloudinary from "../utils/cloudaniry";
 import { getPublicIdFromUrl } from "../utils/getPublicFormUrl";
-export const loginSuccess = (request: Request, response: Response) => {
-    if (request.user) {
-        response.status(200).json({ message: "User logged in", user: request.user });
-    } else {
-        response.status(401).json({ message: "Not authorized" });
+export const loginSuccess = async (request: Request, response: Response) => {
+    try {
+        const user = await User.findById((request as any).userId).select('-password');
+        if (!user) {
+            return response.status(404).json({ success: false, message: 'No user is authenticated!' });
+        }
+        return response.status(200).json({ success: true, user });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        return response.status(400).json({ success: false, message });
     }
 };
-
 export const logoutUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         await new Promise<void>((resolve, reject) => {
@@ -24,18 +28,20 @@ export const logoutUser = async (req: Request, res: Response, next: NextFunction
                 resolve();
             });
         });
-        res.clearCookie("connect.sid", {
+        const cookieOptions = {
             httpOnly: true,
-            sameSite: "strict",
             secure: process.env.NODE_ENV !== "development",
-        });
+            sameSite: (process.env.NODE_ENV === "development" ? "strict" : "none") as "strict" | "none",
+            path: "/",
+        };
+        res.clearCookie("connect.sid", cookieOptions);
+        res.clearCookie("jwt", cookieOptions);
         return res.status(200).json({ message: "Logged out successfully" });
     } catch (err) {
         console.error("Logout error:", err);
         return res.status(500).json({ message: "Logout failed" });
     }
 };
-
 export const editUser = async (request: Request, response: Response) => {
     try {
         const { newDisplayName, userId } = request.body;

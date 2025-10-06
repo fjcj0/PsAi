@@ -45,11 +45,11 @@ app.use(
         secret: process.env.SESSION_SECRET || "secret",
         resave: false,
         saveUninitialized: false,
-        proxy: true,
         cookie: {
             httpOnly: true,
             secure: process.env.NODE_ENV != 'development',
-            sameSite: process.env.NODE_ENV != 'development' ? 'none' : 'lax',
+            sameSite: process.env.NODE_ENV == "development" ? 'strict' : 'none',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         },
     })
 );

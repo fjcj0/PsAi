@@ -9,7 +9,7 @@ export const generateTokenAndSetCookie = (userId: Mongoose, response: Response) 
     response.cookie("jwt", token, {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: process.env.NODE_ENV == "development" ? 'strict' : 'none',
         secure: process.env.NODE_ENV !== "development",
     });
     return token;
