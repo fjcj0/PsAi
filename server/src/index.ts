@@ -30,9 +30,9 @@ if (!MongoUrl) throw new Error(chalk.red.bold("MONGO_URL not defined"));
 
 const app = express();
 
-if (process.env.NODE_ENV !== 'development') {
+/*if (process.env.NODE_ENV !== 'development') {
     app.set("trust proxy", 1);
-}
+}*/
 
 
 app.use(cors({
@@ -50,7 +50,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV !== 'development',
+        secure: false,/*process.env.NODE_ENV !== 'development'*/
         sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
     },
 }));
