@@ -1,16 +1,19 @@
 "use client";
-import React, { useState } from "react";
-import { Image as ImageIcon, Send, X as XIcon } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { Image as ImageIcon, Send, X as XIcon, Mic, StopCircle } from "lucide-react";
 import { useMessage } from "../../context/MessageContext";
 import Image from "next/image";
 import { useMessageStore } from "@/store/messageStore";
 import { useAuth } from "@/app/context/UserContext";
 import Loading from "@/app/animations/Loading";
+import toast from "react-hot-toast";
 const Input = () => {
     const { user } = useAuth();
     const { message, setMessage, conversation, setConversation } = useMessage();
     const { sendMessageToAi, isLoadingAi } = useMessageStore();
     const [preview, setPreview] = useState<string | null>(null);
+    const [isRecording, setIsRecording] = useState(false);
+    const recognitionRef = useRef<any>(null);
     const cleanBase64Image = (base64: string) => {
         if (!base64) return null;
         const regex = /^data:(image\/[a-zA-Z]+);base64,(data:image\/[a-zA-Z]+;base64,)?/;
@@ -45,6 +48,42 @@ const Input = () => {
             onSendMessage();
         }
     };
+    const startRecording = () => {
+        const SpeechRecognition =
+            (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            toast.error("Speech Recognition not supported in this browser!!");
+            return;
+        }
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = true;
+        recognitionRef.current.lang = "en-US";
+        recognitionRef.current.onresult = (event: any) => {
+            let finalTranscript = "";
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript + " ";
+                }
+            }
+            setMessage((prev) => prev + " " + finalTranscript);
+        };
+        recognitionRef.current.onerror = (event: any) => {
+            console.error("Speech recognition error:", event.error);
+            setIsRecording(false);
+        };
+        recognitionRef.current.onend = () => {
+            setIsRecording(false);
+        };
+        recognitionRef.current.start();
+        setIsRecording(true);
+    };
+    const stopRecording = () => {
+        recognitionRef.current?.stop();
+        setIsRecording(false);
+    };
     return (
         <div className="relative w-full flex flex-row px-3 py-4 rounded-xl justify-between text-white/30 bg-slate-700/20">
             <textarea
@@ -54,11 +93,25 @@ const Input = () => {
                 className="w-full overflow-y-auto resize-none bg-transparent text-sm outline-none placeholder:text-white/30 p-2 rounded-lg"
                 placeholder="Ask us anything..."
             />
-            <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" id="image-upload" />
+            <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+                id="image-upload"
+            />
             <div className="flex flex-row gap-3 items-center">
                 <label htmlFor="image-upload" className="hover:text-white cursor-pointer">
                     <ImageIcon size={20} />
                 </label>
+                <button
+                    type="button"
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className="hover:text-white duration-300"
+                >
+                    {isRecording ? <StopCircle size={20} /> : <Mic size={20} />}
+                </button>
+
                 <button
                     disabled={isLoadingAi}
                     type="button"
