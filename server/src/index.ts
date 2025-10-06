@@ -48,8 +48,8 @@ app.use(
         saveUninitialized: false,
         cookie: {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: process.env.NODE_ENV != 'development',
+            sameSite: process.env.NODE_ENV != 'development' ? 'none' : 'lax',
         },
     })
 );
@@ -61,6 +61,14 @@ app.use(passport.session());
 app.use("/api/auth", authRoutes);
 
 app.use("/api/message", messageRoutes);
+
+if (process.env.NODE_ENV != "development") {
+    const path = require("path");
+    app.use(express.static(path.join(__dirname, "../../client/.next")));
+    app.get("*", (_, res) => {
+        res.sendFile(path.join(__dirname, "../../client/.next/index.html"));
+    });
+}
 
 const httpServer = createServer(app);
 
