@@ -11,7 +11,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     fetchUser: async () => {
         set({ isLoading: true });
         try {
-            const res = await axios.get(`${API_URL}/success`);
+            const res = await axios.get(`${API_URL}/success`, { withCredentials: true });
             if (res.data?.user) {
                 set({ user: res.data.user, isAuth: true });
             } else {
@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     },
     logout: async () => {
         try {
-            await axios.get(`${API_URL}/logout`);
+            await axios.get(`${API_URL}/logout`, { withCredentials: true });
             set({ user: null, isAuth: false });
         } catch (err) {
             const error = err as AxiosError;
@@ -47,11 +47,10 @@ export const useAuthStore = create<AuthState>((set) => ({
             formData.append("userId", userId);
             if (newDisplayName) formData.append("newDisplayName", newDisplayName);
             if (newProfilePicture) formData.append("newProfilePicture", newProfilePicture);
-
             const response = await axios.post(`${API_URL}/edit-user`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
+                withCredentials: true,
             });
-
             set({ user: response.data.user, isLoading: false });
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
