@@ -28,6 +28,10 @@ if (!MongoUrl) throw new Error(chalk.red.bold("MONGO_URL not defined"));
 
 const app = express();
 
+if (process.env.NODE_ENV != 'development') {
+    app.set("trust proxy", 1);
+}
+
 app.use(
     cors({
         origin: `${process.env.CLIENT_URL}`,
