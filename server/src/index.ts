@@ -18,6 +18,7 @@ import { callEditPictureAi } from "../utils/callEditPictureAi";
 import { Conversation } from "../models/conversation.model";
 import fs from 'fs';
 import { cleanBase64Image } from "../utils/cleanBase64";
+import path from "path";
 
 const PORT = process.env.PORT || 5205;
 
@@ -63,7 +64,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
 
 if (process.env.NODE_ENV != "development") {
-    const path = require("path");
     app.use(express.static(path.join(__dirname, "../../client/.next")));
     app.get("*", (_, res) => {
         res.sendFile(path.join(__dirname, "../../client/.next/index.html"));
