@@ -7,10 +7,7 @@ const Header = () => {
     const { user, isAuth, logout, loading } = useAuth();
     const [displayInfo, setDisplayInfo] = useState(false);
     const handleGoogleSignIn = () => {
-        window.location.href =
-            process.env.NODE_ENV === "development"
-                ? "http://localhost:5205/api/auth/google"
-                : "/api/auth/google";
+        window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/google`;
     };
     const handleLogout = async () => {
         await logout();
