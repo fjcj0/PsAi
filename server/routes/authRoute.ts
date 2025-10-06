@@ -19,8 +19,6 @@ router.get(
             }
             req.logIn(user, async (err) => {
                 if (err) return next(err);
-                const { generateTokenAndSetCookie } = await import("../utils/generateTokenAndSetCookie");
-                generateTokenAndSetCookie(user.id, res);
                 return res.redirect(
                     `${process.env.CLIENT_URL}/chat`
                 );

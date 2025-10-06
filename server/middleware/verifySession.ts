@@ -1,9 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-export const verifySession = (
-    request: Request,
-    response: Response,
-    next: NextFunction
-) => {
+export const verifySession = (request: Request, response: Response, next: NextFunction) => {
     if (request.user) {
         const userId = (request.user as any)._id || (request.user as any).id;
         return next();

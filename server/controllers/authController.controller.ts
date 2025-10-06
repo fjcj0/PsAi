@@ -13,10 +13,10 @@ export const loginSuccess = (request: Request, response: Response) => {
 export const logoutUser = (request: Request, response: Response, next: NextFunction) => {
     request.logout((err) => {
         if (err) return next(err);
-        response.clearCookie("jwt", {
+        response.clearCookie("connect.sid", {
             httpOnly: true,
-            sameSite: "strict",
-            secure: process.env.NODE_ENV !== "development",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         });
         response.redirect(`${process.env.CLIENT_URL}`);
     });
