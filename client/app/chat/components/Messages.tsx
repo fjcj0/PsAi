@@ -9,7 +9,7 @@ type Message = {
     role: "user" | "ai";
     content: string;
     image?: string;
-    imageUrl?: string;
+    imageUrl?: string | null;
 };
 const formatContent = (content: string) => {
     if (!content) return null;

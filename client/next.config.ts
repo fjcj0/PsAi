@@ -16,11 +16,13 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/auth/:path*",
-        destination: "http://localhost:5205/api/auth/:path*",
+        destination: `${process.env.NODE_ENV == 'development' ? process.env.CLIENT_URL
+          : ''}/api/auth/:path*`,
       },
       {
         source: "/api/message/:path*",
-        destination: "http://localhost:5205/api/message/:path*",
+        destination: `${process.env.NODE_ENV == 'development' ? process.env.CLIENT_URL
+          : ''}/api/message/:path*`,
       },
     ];
   },

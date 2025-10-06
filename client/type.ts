@@ -1,7 +1,7 @@
 export interface buttonProps {
     title: String;
     style: String;
-    type: String;
+    type?: "button" | "submit" | "reset";
     icon: String;
 };
 export interface homeProps {

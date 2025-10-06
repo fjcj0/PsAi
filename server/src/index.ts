@@ -29,7 +29,8 @@ const app = express();
 
 app.use(
     cors({
-        origin: "http://localhost:3000",
+        origin: `${process.env.NODE_ENV == 'development' ? process.env.CLIENT_URL
+            : ''}`,
         credentials: true,
     })
 );
@@ -65,7 +66,8 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: `${process.env.NODE_ENV == 'development' ? process.env.CLIENT_URL
+            : ''}`,
         methods: ["GET", "POST", "DELETE", "PUT"],
         credentials: true,
     },
