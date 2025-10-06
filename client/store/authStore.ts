@@ -11,7 +11,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     fetchUser: async () => {
         set({ isLoading: true });
         try {
-            const res = await axios.get(`${API_URL}/success`, { withCredentials: true });
+            const res = await axios.get(`${API_URL}/success`);
             if (res.data?.user) {
                 set({ user: res.data.user, isAuth: true });
             } else {
@@ -19,19 +19,25 @@ export const useAuthStore = create<AuthState>((set) => ({
             }
         } catch (err) {
             const error = err as AxiosError;
-            console.log(error.message);
-            set({ user: null, isAuth: false, error: error.message });
+            if (error.response?.status === 401) {
+                console.log("Session expired, clearing frontend state");
+                set({ user: null, isAuth: false });
+            } else {
+                console.log(error.message);
+                set({ error: error.message });
+            }
         } finally {
             set({ isLoading: false });
         }
     },
     logout: async () => {
         try {
-            await axios.get(`${API_URL}/logout`, { withCredentials: true });
+            await axios.get(`${API_URL}/logout`);
             set({ user: null, isAuth: false });
         } catch (err) {
             const error = err as AxiosError;
-            console.log(error.message);
+            console.log("Logout error:", error.message);
+            set({ user: null, isAuth: false });
         }
     },
     editUser: async ({ userId, newDisplayName, newProfilePicture }: EditUserProps) => {
@@ -41,19 +47,17 @@ export const useAuthStore = create<AuthState>((set) => ({
             formData.append("userId", userId);
             if (newDisplayName) formData.append("newDisplayName", newDisplayName);
             if (newProfilePicture) formData.append("newProfilePicture", newProfilePicture);
+
             const response = await axios.post(`${API_URL}/edit-user`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
-                withCredentials: true,
             });
-            set({
-                user: response.data.user,
-                isLoading: false,
-            });
+
+            set({ user: response.data.user, isLoading: false });
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
             const message = error.response?.data?.message || error.message;
             set({ error: message, isLoading: false });
-            console.log(message);
+            console.log("Edit user error:", message);
             throw new Error(message);
         }
     },

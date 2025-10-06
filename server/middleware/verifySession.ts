@@ -1,11 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-export const verifySession = (request: Request, response: Response, next: NextFunction) => {
-    if (request.user) {
-        const userId = (request.user as any)._id || (request.user as any).id;
-        return next();
-    }
-    return response.status(401).json({
+export const verifySession = (req: Request, res: Response, next: NextFunction) => {
+    if (req.user) return next();
+    console.log("Session expired or user not logged in");
+    return res.status(401).json({
         success: false,
-        message: "Unauthorized - session not found or expired",
+        message: "Unauthorized - your session has expired. Please log in again.",
     });
 };

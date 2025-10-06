@@ -10,16 +10,30 @@ export const loginSuccess = (request: Request, response: Response) => {
     }
 };
 
-export const logoutUser = (request: Request, response: Response, next: NextFunction) => {
-    request.logout((err) => {
-        if (err) return next(err);
-        response.clearCookie("connect.sid", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+export const logoutUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await new Promise<void>((resolve, reject) => {
+            req.logout((err) => {
+                if (err) return reject(err);
+                resolve();
+            });
         });
-        response.redirect(`${process.env.CLIENT_URL}`);
-    });
+        await new Promise<void>((resolve, reject) => {
+            req.session.destroy((err) => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
+        res.clearCookie("connect.sid", {
+            httpOnly: true,
+            sameSite: "strict",
+            secure: process.env.NODE_ENV !== "development",
+        });
+        return res.status(200).json({ message: "Logged out successfully" });
+    } catch (err) {
+        console.error("Logout error:", err);
+        return res.status(500).json({ message: "Logout failed" });
+    }
 };
 
 export const editUser = async (request: Request, response: Response) => {

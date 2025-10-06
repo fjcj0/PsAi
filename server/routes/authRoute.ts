@@ -13,12 +13,13 @@ router.get(
     (req, res, next) => {
         passport.authenticate("google", async (err: any, user: any) => {
             if (err || !user) {
-                const errorRedirect =
-                    `${process.env.CLIENT_URL}/?error=${encodeURIComponent("failed login")}`
+                const errorRedirect = `${process.env.CLIENT_URL}/?error=${encodeURIComponent("failed login")}`
                 return res.redirect(errorRedirect);
             }
             req.logIn(user, async (err) => {
                 if (err) return next(err);
+                const { generateTokenAndSetCookie } = await import("../utils/generateTokenAndSetCookie");
+                generateTokenAndSetCookie(user.id, res);
                 return res.redirect(
                     `${process.env.CLIENT_URL}/chat`
                 );
