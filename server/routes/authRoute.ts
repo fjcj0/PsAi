@@ -14,9 +14,7 @@ router.get(
         passport.authenticate("google", async (err: any, user: any) => {
             if (err || !user) {
                 const errorRedirect =
-                    process.env.NODE_ENV !== "development"
-                        ? `${process.env.CLIENT_URL}/?error=${encodeURIComponent("failed login")}`
-                        : `http://localhost:3000/?error=${encodeURIComponent("failed login")}`;
+                    `${process.env.CLIENT_URL}/?error=${encodeURIComponent("failed login")}`
                 return res.redirect(errorRedirect);
             }
             req.logIn(user, async (err) => {
@@ -24,9 +22,7 @@ router.get(
                 const { generateTokenAndSetCookie } = await import("../utils/generateTokenAndSetCookie");
                 generateTokenAndSetCookie(user.id, res);
                 return res.redirect(
-                    process.env.NODE_ENV !== "development"
-                        ? `${process.env.CLIENT_URL}/chat`
-                        : "http://localhost:3000/chat"
+                    `${process.env.CLIENT_URL}/chat`
                 );
             });
         })(req, res, next);
