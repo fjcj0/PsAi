@@ -16,11 +16,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/auth/:path*",
-        destination: `${process.env.SERVER_URL}/api/auth/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/:path*`,
       },
       {
         source: "/api/message/:path*",
-        destination: `${process.env.SERVER_URL}/api/message/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/message/:path*`,
       },
     ];
   },
