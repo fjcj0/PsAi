@@ -18,7 +18,9 @@ import { callEditPictureAi } from "../utils/callEditPictureAi";
 import { Conversation } from "../models/conversation.model";
 import fs from 'fs';
 import { cleanBase64Image } from "../utils/cleanBase64";
-import path from "path";
+
+const CLIENT_URL = process.env.CLIENT_URL!;
+
 
 const PORT = process.env.PORT || 5205;
 
@@ -28,38 +30,32 @@ if (!MongoUrl) throw new Error(chalk.red.bold("MONGO_URL not defined"));
 
 const app = express();
 
-if (process.env.NODE_ENV != 'development') {
+if (process.env.NODE_ENV !== 'development') {
     app.set("trust proxy", 1);
 }
 
-app.use(
-    cors({
-        origin: `${process.env.CLIENT_URL}`,
-        credentials: true,
-    })
-);
 
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+    origin: CLIENT_URL,
+    credentials: true,
+}));
 
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET || "secret",
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            httpOnly: true,
-            secure: process.env.NODE_ENV != 'development',
-            sameSite: process.env.NODE_ENV != 'development' ? 'none' : 'lax',
-        },
-    })
-);
+app.use(session({
+    secret: process.env.SESSION_SECRET || "secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development',
+        sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
+    },
+}));
 
 app.use(passport.initialize());
-
 app.use(passport.session());
 
 app.use("/api/auth", authRoutes);
