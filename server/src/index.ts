@@ -64,9 +64,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
 
 if (process.env.NODE_ENV != "development") {
-    app.use(express.static(path.join(__dirname, "../../client/.next")));
-    app.get("*", (_, res) => {
-        res.sendFile(path.join(__dirname, "../../client/.next/index.html"));
+    const staticPath = path.join(__dirname, "../../client/out");
+    app.use(express.static(staticPath));
+    app.get("/*", (_, res) => {
+        res.sendFile(path.join(staticPath, "index.html"));
     });
 }
 
