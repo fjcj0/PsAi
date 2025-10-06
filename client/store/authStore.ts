@@ -2,7 +2,7 @@ import { create } from "zustand";
 import axios, { AxiosError } from "axios";
 import { AuthState, EditUserProps } from "@/type";
 axios.defaults.withCredentials = true;
-const API_URL = "/api/auth";
+const API_URL = `${process.env.SERVER_URL}/api/auth`;
 export const useAuthStore = create<AuthState>((set) => ({
     isAuth: null,
     isLoading: false,

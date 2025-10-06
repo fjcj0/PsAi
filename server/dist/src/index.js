@@ -29,8 +29,7 @@ if (!MongoUrl)
     throw new Error(chalk_1.default.red.bold("MONGO_URL not defined"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
-    origin: `${process.env.NODE_ENV == 'development' ? process.env.CLIENT_URL
-        : ''}`,
+    origin: process.env.CLIENT_URL,
     credentials: true,
 }));
 app.use(express_1.default.urlencoded({ extended: true }));
@@ -42,8 +41,8 @@ app.use((0, express_session_1.default)({
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+        secure: process.env.NODE_ENV != 'development',
+        sameSite: process.env.NODE_ENV != 'development' ? 'none' : 'lax',
     },
 }));
 app.use(passport_1.default.initialize());
@@ -53,8 +52,7 @@ app.use("/api/message", messageRoute_1.default);
 const httpServer = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(httpServer, {
     cors: {
-        origin: `${process.env.NODE_ENV == 'development' ? process.env.CLIENT_URL
-            : ''}`,
+        origin: process.env.CLIENT_URL,
         methods: ["GET", "POST", "DELETE", "PUT"],
         credentials: true,
     },
@@ -168,7 +166,7 @@ io.on("connection", (socket) => {
 httpServer.listen(PORT, async () => {
     try {
         await (0, db_1.connectDB)();
-        console.log(chalk_1.default.cyanBright.bold(`Server running at http://localhost:${PORT}`));
+        console.log(chalk_1.default.cyanBright.bold(`Server running at ${process.env.CLIENT_URL}:${PORT}`));
     }
     catch (error) {
         console.log(chalk_1.default.red.bold(error instanceof Error ? error.message : String(error)));

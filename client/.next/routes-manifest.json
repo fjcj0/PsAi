@@ -18,12 +18,12 @@
     "afterFiles": [
       {
         "source": "/api/auth/:path*",
-        "destination": "/api/auth/:path*",
+        "destination": "http://localhost:5205/api/auth/:path*",
         "regex": "^/api/auth(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
       },
       {
         "source": "/api/message/:path*",
-        "destination": "/api/message/:path*",
+        "destination": "http://localhost:5205/api/message/:path*",
         "regex": "^/api/message(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
       }
     ],

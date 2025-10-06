@@ -18,7 +18,6 @@ import { callEditPictureAi } from "../utils/callEditPictureAi";
 import { Conversation } from "../models/conversation.model";
 import fs from 'fs';
 import { cleanBase64Image } from "../utils/cleanBase64";
-import path from "path";
 
 const PORT = process.env.PORT || 5205;
 
@@ -30,8 +29,7 @@ const app = express();
 
 app.use(
     cors({
-        origin: `${process.env.NODE_ENV == 'development' ? process.env.CLIENT_URL
-            : ''}`,
+        origin: process.env.CLIENT_URL,
         credentials: true,
     })
 );
@@ -63,20 +61,11 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/message", messageRoutes);
 
-if (process.env.NODE_ENV != "development") {
-    const staticPath = path.join(__dirname, "../../client/out");
-    app.use(express.static(staticPath));
-    app.get("/*", (_, res) => {
-        res.sendFile(path.join(staticPath, "index.html"));
-    });
-}
-
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
     cors: {
-        origin: `${process.env.NODE_ENV == 'development' ? process.env.CLIENT_URL
-            : ''}`,
+        origin: process.env.CLIENT_URL,
         methods: ["GET", "POST", "DELETE", "PUT"],
         credentials: true,
     },
@@ -188,7 +177,7 @@ io.on("connection", (socket) => {
 httpServer.listen(PORT, async () => {
     try {
         await connectDB();
-        console.log(chalk.cyanBright.bold(`Server running at http://localhost:${PORT}`));
+        console.log(chalk.cyanBright.bold(`Server running at ${process.env.CLIENT_URL}:${PORT}`));
     } catch (error) {
         console.log(
             chalk.red.bold(error instanceof Error ? error.message : String(error))
