@@ -8,8 +8,8 @@ export const generateTokenAndSetCookie = (userId: string | Types.ObjectId, respo
     });
     response.cookie("jwt", token, {
         httpOnly: true,
-        secure: false/*process.env.NODE_ENV === "production"*/,
-        sameSite: 'strict'/*process.env.NODE_ENV === "production" ? "none" : "lax"*/,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
     return token;
 };
