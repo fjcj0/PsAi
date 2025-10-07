@@ -177,18 +177,15 @@ io.on("connection", (socket) => {
     });
 });
 const dev = process.env.NODE_ENV !== 'production';
-const clientDir = path.join(__dirname, '../../client');
-
-const nextApp = next({
+const render = next({
     dev,
-    dir: clientDir,
+    dir: path.join(__dirname, '../../client'),
     conf: {
         distDir: '.next',
     },
 });
-
-const handle = nextApp.getRequestHandler();
-nextApp.prepare().then(() => {
+const handle = render.getRequestHandler();
+render.prepare().then(() => {
     app.all('*', (req, res) => handle(req, res));
     httpServer.listen(PORT, async () => {
         try {

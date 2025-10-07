@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
 "install-all": "npm install && cd client && npm install && cd ../server && npm install --include=dev",
-"build-all": "cd client && npm run build && cd ../server && npm run build",
+"build-all": "cd client && npm install && npm run build && cd ../server && npm install --include=dev && npm run build",
 "start": "cd server && node dist/src/index.js"
   },
   "keywords": [],
