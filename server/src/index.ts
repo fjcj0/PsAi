@@ -177,7 +177,13 @@ io.on("connection", (socket) => {
     });
 });
 const dev = process.env.NODE_ENV !== 'production';
-const render = next({ dev, dir: path.join(__dirname, '../../client') });
+const render = next({
+    dev,
+    dir: path.join(__dirname, '../../client'),
+    conf: {
+        distDir: '.next',
+    },
+});
 const handle = render.getRequestHandler();
 render.prepare().then(() => {
     app.all('*', (req, res) => handle(req, res));
