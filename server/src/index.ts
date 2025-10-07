@@ -18,6 +18,8 @@ import { callEditPictureAi } from "../utils/callEditPictureAi";
 import { Conversation } from "../models/conversation.model";
 import fs from 'fs';
 import { cleanBase64Image } from "../utils/cleanBase64";
+import next from 'next';
+import path from "path";
 
 const PORT = process.env.PORT || 5205;
 
@@ -174,14 +176,19 @@ io.on("connection", (socket) => {
         console.log(`Client disconnected: ${socket.id}`);
     });
 });
-
-httpServer.listen(PORT, async () => {
-    try {
-        await connectDB();
-        console.log(chalk.cyanBright.bold(`Server running at http://localhost:${PORT}`));
-    } catch (error) {
-        console.log(
-            chalk.red.bold(error instanceof Error ? error.message : String(error))
-        );
-    }
+const dev = process.env.NODE_ENV !== 'production';
+const render = next({ dev, dir: path.join(__dirname, '../../client') });
+const handle = render.getRequestHandler();
+render.prepare().then(() => {
+    app.all('*', (req, res) => handle(req, res));
+    httpServer.listen(PORT, async () => {
+        try {
+            await connectDB();
+            console.log(chalk.cyanBright.bold(`Server running at http://localhost:${PORT}`));
+        } catch (error) {
+            console.log(
+                chalk.red.bold(error instanceof Error ? error.message : String(error))
+            );
+        }
+    });
 });
