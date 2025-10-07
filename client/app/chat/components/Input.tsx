@@ -90,7 +90,7 @@ const Input = () => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyPress}
-                className="w-full overflow-y-auto resize-none bg-transparent text-sm outline-none placeholder:text-white/30 p-2 rounded-lg"
+                className="w-full overflow-y-auto scrollbar-hide resize-none bg-transparent text-sm outline-none placeholder:text-white/30 p-2 rounded-lg"
                 placeholder="Ask us anything..."
             />
             <input
