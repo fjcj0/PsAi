@@ -20,9 +20,7 @@ router.get(
                 if (err) return next(err);
                 const { generateTokenAndSetCookie } = await import("../utils/generateTokenAndSetCookie");
                 generateTokenAndSetCookie(user.id, res);
-                return res.redirect(
-                    `${process.env.CLIENT_URL}/chat`
-                );
+                return res.status(200).json({ success: true });
             });
         })(req, res, next);
     }

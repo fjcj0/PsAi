@@ -3,14 +3,33 @@ import { useState } from "react";
 import { useAuth } from "../context/UserContext";
 import Image from "next/image";
 import React from "react";
+import { useAuthStore } from "@/store/authStore";
 const Header = () => {
     const { user, isAuth, logout, loading } = useAuth();
     const [displayInfo, setDisplayInfo] = useState(false);
-
-    const handleGoogleSignIn = () => {
-        window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/google`;
+    const { fetchUser } = useAuthStore();
+    const handleGoogleSignIn = async () => {
+        const width = 500;
+        const height = 600;
+        const left = (window.screen.width - width) / 2;
+        const top = (window.screen.height - height) / 2;
+        const popup = window.open(
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/google`,
+            "google-login",
+            `width=${width},height=${height},top=${top},left=${left}`
+        );
+        const interval = setInterval(async () => {
+            try {
+                if (!popup || popup.closed) {
+                    clearInterval(interval);
+                    await fetchUser();
+                    window.location.href = "/chat";
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }, 500);
     };
-
     const handleLogout = async () => {
         await logout();
         window.location.href = "/";
