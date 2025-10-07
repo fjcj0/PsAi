@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "cd client && npm install && npm run build && cd ../server && npm install --include=dev && npm run build",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install --include=dev",
+    "build": "cd client && npm run build && cd ../server && npm run build",
     "start": "cd server && node dist/src/index.js"
   },
   "keywords": [],
