@@ -9,7 +9,7 @@ export const generateTokenAndSetCookie = (userId: string | Types.ObjectId, respo
     response.cookie("jwt", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        sameSite: 'strict'/*process.env.NODE_ENV === "production" ? "none" : "lax"*/,
     });
     return token;
 };
