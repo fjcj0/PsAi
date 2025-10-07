@@ -181,7 +181,7 @@ const render = next({
     dev,
     dir: path.join(__dirname, '../../client'),
     conf: {
-        distDir: '.next',
+        distDir: path.join(__dirname, '../../client/.next'),
     },
 });
 const handle = render.getRequestHandler();
