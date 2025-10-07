@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "install-all": "npm install && cd client && npm install && cd ../server && npm install --include=dev",
-    "build-all": "cd client && npm run build && cp -r .next ../server/.next && cd ../server && npm run build",
-    "start": "cd server && node dist/src/index.js"
+"install-all": "npm install && cd client && npm install && cd ../server && npm install --include=dev",
+"build-all": "cd client && npm run build && cd ../server && npm run build",
+"start": "cd server && node dist/src/index.js"
   },
   "keywords": [],
   "author": "",
