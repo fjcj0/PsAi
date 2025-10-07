@@ -11,7 +11,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     fetchUser: async () => {
         set({ isLoading: true });
         try {
-            const res = await axios.get(`${API_URL}/success`);
+            const res = await axios.get(`${API_URL}/success`, { withCredentials: true });
             if (res.data?.user) {
                 set({ user: res.data.user, isAuth: true });
             } else {
@@ -20,7 +20,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         } catch (err) {
             const error = err as AxiosError;
             if (error.response?.status === 401) {
-                console.log("Session expired, clearing frontend state");
                 set({ user: null, isAuth: false });
             } else {
                 console.log(error.message);
@@ -32,7 +31,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     },
     logout: async () => {
         try {
-            await axios.get(`${API_URL}/logout`);
+            await axios.get(`${API_URL}/logout`, { withCredentials: true });
             set({ user: null, isAuth: false });
         } catch (err) {
             const error = err as AxiosError;
@@ -50,6 +49,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
             const response = await axios.post(`${API_URL}/edit-user`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
+
             });
 
             set({ user: response.data.user, isLoading: false });

@@ -2,16 +2,19 @@ import { Request, Response, NextFunction } from "express";
 import { User } from "../models/user.model";
 import cloudinary from "../utils/cloudaniry";
 import { getPublicIdFromUrl } from "../utils/getPublicFormUrl";
-export const loginSuccess = async (request: Request, response: Response) => {
+import { JwtRequest } from "../middleware/verifySession";
+export const loginSuccess = async (req: JwtRequest, res: Response) => {
     try {
-        const user = await User.findById((request as any).userId).select('-password');
+        const user = await User.findById(req.userId).select("-password");
         if (!user) {
-            return response.status(404).json({ success: false, message: 'No user is authenticated!' });
+            return res.status(404).json({ success: false, message: "No user is authenticated!" });
         }
-        return response.status(200).json({ success: true, user });
-    } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : String(error);
-        return response.status(400).json({ success: false, message });
+        return res.status(200).json({ success: true, user });
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error instanceof Error ? error.message : String(error),
+        });
     }
 };
 export const logoutUser = async (req: Request, res: Response, next: NextFunction) => {
