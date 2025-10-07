@@ -13,43 +13,26 @@ type Message = {
 };
 const formatContent = (content: string) => {
     if (!content) return null;
-
-    // Remove Markdown symbols: ** and `
     let cleanedText = content.replace(/(\*\*|`)/g, '');
-
-    // Add a line break before code blocks
     cleanedText = cleanedText.replace(/(^|\n)(cpp|```cpp)/g, '$1<br />$2');
-
-    // Add a line break before each closing brace
     cleanedText = cleanedText.replace(/}/g, '<br>}');
-
-    // Split into lines instead of splitting on periods
     const lines = cleanedText.split(/\n/);
-
     const highlightComments = (text: string) => {
         return text
             .replace(/(\/\/.*)/g, '<span style="color: green;">$1</span><br />')
             .replace(/(\/\*[\s\S]*?\*\/)/g, '<span style="color: green;">$1</span><br />');
     };
-
     return lines.map((line, idx) => {
         const trimmed = line.trim();
-
-        // Numbered list items
         const isNumberedList = /^\d+\.\s/.test(trimmed);
-
-        // Code block lines
         const isCode = /^cpp/.test(trimmed);
-
         if (isNumberedList) {
-            // Wrap numbered items in a block with spacing
             return (
                 <div key={idx} style={{ marginBottom: '1em' }}>
                     <span dangerouslySetInnerHTML={{ __html: highlightComments(trimmed) }} />
                 </div>
             );
         }
-
         if (isCode) {
             return (
                 <pre
@@ -66,8 +49,6 @@ const formatContent = (content: string) => {
                 </pre>
             );
         }
-
-        // Normal text
         return (
             <span key={idx}>
                 <span dangerouslySetInnerHTML={{ __html: highlightComments(trimmed) }} />
@@ -83,20 +64,17 @@ const Messages = () => {
     const { user } = useAuthStore();
     const { getMessages, messagesInConversation, isLoadingMessages, isLoadingAi } = useMessageStore();
     const [loadingMain, setLoadingMain] = useState(false);
-
     useEffect(() => {
         setLoadingMain(true);
         const timer = setTimeout(() => setLoadingMain(false), 3000);
         return () => clearTimeout(timer);
     }, []);
-
     useEffect(() => {
         if (conversation && user?._id) getMessages(user._id, conversation);
         else setMessages([]);
     }, [conversation, user?._id, getMessages]);
 
     useEffect(() => setMessages(messagesInConversation), [messagesInConversation]);
-
     if (!conversation) {
         return loadingMain ? (
             <div className="flex justify-center items-center h-full"><Loading /></div>
@@ -125,7 +103,7 @@ const Messages = () => {
         );
     }
     return (
-        <div className="w-full h-screen flex flex-col gap-4 px-4 py-6 overflow-y-auto">
+        <div className="w-full h-screen flex flex-col gap-4 px-4 py-6 scrollbar-hide overflow-y-auto">
             {isLoadingMessages ? (
                 <div className="flex justify-center py-10"><Loading /></div>
             ) : messages.length === 0 ? (
@@ -171,7 +149,5 @@ const Messages = () => {
             )}
         </div>
     );
-
 };
-
 export default Messages;
