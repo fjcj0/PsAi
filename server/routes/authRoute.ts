@@ -3,7 +3,6 @@ import passport from "../config/passport";
 import { editUser, loginSuccess, logoutUser } from "../controllers/authController.controller";
 import { upload } from "../utils/multer";
 import { verifySession } from "../middleware/verifySession";
-import { Response } from "express";
 
 const router = Router();
 
