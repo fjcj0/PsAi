@@ -3,7 +3,7 @@ import axios from "axios";
 import { MessageStore, MessageType } from "@/type";
 import { socket } from "@/utils/socket";
 axios.defaults.withCredentials = true;
-const API_URL = `/api/message`;
+const API_URL = `${process.env.NEXT_PUBLIC_SERVER_URL}/api/message`;
 export const useMessageStore = create<MessageStore>((set) => ({
     conversationsUser: [],
     messagesInConversation: [],
